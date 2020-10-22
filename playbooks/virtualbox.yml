@@ -36,7 +36,7 @@
       yum:
         name:
           - fontconfig
-          - adoptopenjdk-8-hotspot
+          - adoptopenjdk-11-hotspot
           - git
         state: latest
       
@@ -120,13 +120,22 @@
         enabled: yes
         gpgcheck: yes
         gpgkey: https://download.docker.com/linux/centos/gpg
-    - name: Install Docker and unzip
+    - name: hashicorp yum repository
+      yum_repository:
+        name: hashicorp
+        description: Hashicorp Stable - $basearch
+        baseurl: https://rpm.releases.hashicorp.com/RHEL/$releasever/$basearch/stable
+        enabled: yes
+        gpgcheck: yes
+        gpgkey: https://rpm.releases.hashicorp.com/gpg
+    - name: Install Docker, waypoint and unzip
       yum:
         name: 
           - docker-ce
           - docker-ce-cli
           - containerd.io
           - unzip
+          - waypoint
         state: latest
     - name: add docker group
       group:
