@@ -95,9 +95,9 @@
       systemd:
         name: jenkins
         state: started
-      
-- name: Agent installation
-  hosts: agents
+
+- name: Common agent and Waypoint server installation
+  hosts: agents,waypoint_servers
   become: yes
   tasks:
     - name: remove any installed docker
@@ -149,7 +149,12 @@
     - name: start Docker service
       systemd:
         name: docker
-        state: started
+        state: started        
+
+- name: Agent installation
+  hosts: agents
+  become: yes
+  tasks:
     - name: create Maven directory
       file: 
         path: "/opt/tools/maven"
@@ -205,4 +210,14 @@
         owner: vagrant
         group: vagrant
         recurse: yes
-    
+
+- name: Waypoint server installation
+  hosts: waypoint_servers
+  become: yes
+  tasks:
+    - name: Pull Waypoint image
+      command: docker pull hashicorp/waypoint:latest
+    - name: Install the Waypoint server
+      command: waypoint install --platform=docker -accept-tos
+      
+      

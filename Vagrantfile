@@ -18,4 +18,13 @@ Vagrant.configure(2) do |config|
       vb.memory = 1024
     end
   end
+
+  config.vm.define "ws1" do |ws1|
+    ws1.vm.network "private_network", ip: "192.168.32.11"
+    ws1.vm.hostname = "ws1"
+    ws1.vm.provider "ws1" do |vb|
+      vb.cpus = 1
+      vb.memory = 1024
+    end
+  end
 end
