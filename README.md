@@ -1,5 +1,9 @@
 # ansible-jenkins
 
+## Prerequisites
+
+* `ansible-galaxy collection install -r requirements.yml`
+
 ## Startup
 
 * `vagrant up`

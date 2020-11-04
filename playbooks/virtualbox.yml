@@ -136,6 +136,7 @@
           - containerd.io
           - unzip
           - waypoint
+          - python-docker-py
         state: latest
     - name: add docker group
       group:
@@ -146,6 +147,8 @@
         name: "{{ ansible_user }}"
         groups: docker
         append: yes
+    - name: do a ssh reset in order to reflect the $USER group changes
+      meta: reset_connection
     - name: start Docker service
       systemd:
         name: docker
@@ -213,11 +216,18 @@
 
 - name: Waypoint server installation
   hosts: waypoint_servers
-  become: yes
   tasks:
     - name: Pull Waypoint image
-      command: docker pull hashicorp/waypoint:latest
+      community.general.docker_image:
+        name: hashicorp/waypoint:latest
+        source: pull
+    - name: Inspect image
+      community.general.docker_image_info:
+        name: hashicorp/waypoint:latest
+      register: result
+    - name: Make sure that hashicorp/waypoint exists locally
+      ansible.builtin.assert:
+        that:
+          - result.images | length == 1
     - name: Install the Waypoint server
       command: waypoint install --platform=docker -accept-tos
-      
-      
