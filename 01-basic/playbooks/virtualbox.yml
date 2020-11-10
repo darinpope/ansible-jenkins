@@ -82,22 +82,14 @@
     - name: Create limits file
       copy:
         dest: "/etc/security/limits.d/30-jenkins.conf"
-        content: |
-          jenkins soft core unlimited
-          jenkins hard core unlimited
-          jenkins soft fsize unlimited
-          jenkins hard fsize unlimited
-          jenkins soft nofile 4096
-          jenkins hard nofile 8192
-          jenkins soft nproc 30654
-          jenkins hard nproc 30654
+        src: "30-jenkins.conf"
     - name: start jenkins service
       systemd:
         name: jenkins
         state: started
 
-- name: Common agent and Waypoint server installation
-  hosts: agents,waypoint_servers
+- name: Agent installation
+  hosts: agents
   become: yes
   tasks:
     - name: remove any installed docker
@@ -120,23 +112,13 @@
         enabled: yes
         gpgcheck: yes
         gpgkey: https://download.docker.com/linux/centos/gpg
-    - name: hashicorp yum repository
-      yum_repository:
-        name: hashicorp
-        description: Hashicorp Stable - $basearch
-        baseurl: https://rpm.releases.hashicorp.com/RHEL/$releasever/$basearch/stable
-        enabled: yes
-        gpgcheck: yes
-        gpgkey: https://rpm.releases.hashicorp.com/gpg
-    - name: Install Docker, waypoint and unzip
+    - name: Install Docker and unzip
       yum:
         name: 
           - docker-ce
           - docker-ce-cli
           - containerd.io
           - unzip
-          - waypoint
-          - python-docker-py
         state: latest
     - name: add docker group
       group:
@@ -153,11 +135,6 @@
       systemd:
         name: docker
         state: started        
-
-- name: Agent installation
-  hosts: agents
-  become: yes
-  tasks:
     - name: create Maven directory
       file: 
         path: "/opt/tools/maven"
@@ -213,21 +190,3 @@
         owner: vagrant
         group: vagrant
         recurse: yes
-
-- name: Waypoint server installation
-  hosts: waypoint_servers
-  tasks:
-    - name: Pull Waypoint image
-      community.general.docker_image:
-        name: hashicorp/waypoint:latest
-        source: pull
-    - name: Inspect image
-      community.general.docker_image_info:
-        name: hashicorp/waypoint:latest
-      register: result
-    - name: Make sure that hashicorp/waypoint exists locally
-      ansible.builtin.assert:
-        that:
-          - result.images | length == 1
-    - name: Install the Waypoint server
-      command: waypoint install --platform=docker -accept-tos
