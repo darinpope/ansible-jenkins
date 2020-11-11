@@ -1,20 +1,43 @@
+credentials:
+  system:
+    domainCredentials:
+    - credentials:
+      - usernamePassword:
+          description: "vagrant"
+          id: "vagrant"
+          password: "{AQAAABAAAAAQiHNENDzojEh5TLRLuOvgIBgIdOwKetkQYISxncNmxvE=}"
+          scope: GLOBAL
+          username: "vagrant"
 jenkins:
   agentProtocols:
   - "JNLP4-connect"
   - "Ping"
-  authorizationStrategy:
-    loggedInUsersCanDoAnything:
-      allowAnonymousRead: false
   crumbIssuer:
     standard:
       excludeClientIPFromCrumb: false
   disableRememberMe: false
   labelAtoms:
+  - name: "agent1"
+  - name: "linux"
   - name: "master"
+  labelString: "asdfwerf"
   markupFormatter: "plainText"
-  mode: NORMAL
+  mode: EXCLUSIVE
   myViewsTabBar: "standard"
-  numExecutors: 2
+  nodes:
+  - permanent:
+      labelString: "linux"
+      launcher:
+        ssh:
+          credentialsId: "vagrant"
+          host: "agent1"
+          port: 22
+          sshHostKeyVerificationStrategy: "nonVerifyingKeyVerificationStrategy"
+      mode: EXCLUSIVE
+      name: "agent1"
+      remoteFS: "/home/vagrant/jenkins-agent"
+      retentionStrategy: "always"
+  numExecutors: 0
   primaryView:
     all:
       name: "all"
@@ -23,23 +46,7 @@ jenkins:
   remotingSecurity:
     enabled: true
   scmCheckoutRetryCount: 0
-  securityRealm:
-    local:
-      allowsSignup: false
-      enableCaptcha: false
-      users:
-      - id: "admin"
-        name: "admin"
-        password: "admin"
-        properties:
-        - "apiToken"
-        - "myView"
-        - preferredProvider:
-            providerId: "default"
-        - "timezone"
-        - mailer:
-            emailAddress: "a@a.com"
-  slaveAgentPort: 50000
+  slaveAgentPort: -1
   updateCenter:
     sites:
     - id: "default"
@@ -61,10 +68,6 @@ unclassified:
     - "jobBuildDiscarder"
   buildStepOperation:
     enabled: false
-  defaultFolderConfiguration:
-    healthMetrics:
-    - worstChildHealthMetric:
-        recursive: true
   email-ext:
     adminRequiredForTemplateTesting: false
     allowUnregisteredEnabled: false
@@ -79,7 +82,7 @@ unclassified:
     defaultTriggerIds:
     - "hudson.plugins.emailext.plugins.trigger.FailureTrigger"
     mailAccount:
-      smtpPassword: "{AQAAABAAAAAQY212IX9Qdlu5t1mn/ucyb9EKuvkzewAHEd5aM7oVo+M=}"
+      smtpPassword: "{AQAAABAAAAAQ9p6h/Sgk0zF7eCCk6ZRVyESg1jZzAn5afPqfR8vmM9g=}"
     maxAttachmentSize: -1
     maxAttachmentSizeMb: -1
     precedenceBulk: false
