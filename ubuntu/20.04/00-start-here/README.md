@@ -18,7 +18,6 @@
 
 * `vagrant ssh jenkins`
 * `sudo su -`
-* `yum -y install wget`
 * create `/etc/security/limits.d/30-jenkins.conf`
   * https://support.cloudbees.com/hc/en-us/articles/222446987-Prepare-Jenkins-for-Support
 
@@ -39,35 +38,35 @@ jenkins hard nproc 30654
 192.168.32.13 jenkins
 192.168.32.15 agent1
 ```
-* https://adoptopenjdk.net/installation.html#linux-pkg
 
-```
-cat <<'EOF' > /etc/yum.repos.d/adoptopenjdk.repo
-[AdoptOpenJDK]
-name=AdoptOpenJDK
-baseurl=http://adoptopenjdk.jfrog.io/adoptopenjdk/rpm/centos/$releasever/$basearch
-enabled=1
-gpgcheck=1
-gpgkey=https://adoptopenjdk.jfrog.io/adoptopenjdk/api/gpg/key/public
-EOF
-```
-
-* repo to get latest version Git
-  * `yum -y install https://packages.endpoint.com/rhel/7/os/x86_64/endpoint-repo-1.7-1.x86_64.rpm`
-
-* Jenkins repo
-  * `wget -O /etc/yum.repos.d/jenkins.repo https://pkg.jenkins.io/redhat-stable/jenkins.repo`
-  * `rpm --import https://pkg.jenkins.io/redhat-stable/jenkins.io.key`
+* install AdoptOpenJDK 11
+  * `apt-get -y install wget apt-transport-https gnupg`
+  * `wget -qO - https://adoptopenjdk.jfrog.io/adoptopenjdk/api/gpg/key/public | apt-key add -`
+  * `echo "deb https://adoptopenjdk.jfrog.io/adoptopenjdk/deb $(lsb_release -cs) main" | tee /etc/apt/sources.list.d/adoptopenjdk.list`
+  * `apt-get update`
+  * `apt-get -y install adoptopenjdk-11-hotspot fontconfig`
+  * more details: https://adoptopenjdk.net/installation.html#linux-pkg
 
 * create directories
   * `mkdir -p /var/cache/jenkins/tmp`
   * `mkdir -p /var/cache/jenkins/heapdumps`
 
-* `yum remove git*`
-* `yum -y install adoptopenjdk-11-hotspot git jenkins fontconfig`
-* edit `/etc/sysconfig/jenkins`
-  * `JENKINS_JAVA_OPTIONS="-Djava.awt.headless=true -Djava.io.tmpdir=/var/cache/jenkins/tmp/"`
-  * `JENKINS_ARGS="--pluginroot=/var/cache/jenkins/plugins"`
+* install Jenkins
+  * `wget -q -O - https://pkg.jenkins.io/debian-stable/jenkins.io.key | apt-key add -`
+  * `echo "deb https://pkg.jenkins.io/debian-stable binary/" | tee /etc/apt/sources.list.d/jenkins.list`
+  * `apt-get update`
+  * `apt-get -y install jenkins`
+  * more details: https://pkg.jenkins.io/debian-stable/
+
+* `systemctl stop jenkins`
+* `rm -rf /var/lib/jenkins/.* 2> /dev/null`
+* `rm -rf /var/cache/jenkins/heapdumps/.* 2> /dev/null`
+* `rm -rf /var/cache/jenkins/tmp/.* 2> /dev/null`
+* `rm -rf /var/cache/jenkins/war`
+* `rm -f /var/log/jenkins/jenkins.log`
+* edit `/etc/default/jenkins`
+  * `JAVA_ARGS="-Djava.awt.headless=true -Djava.io.tmpdir=/var/cache/$NAME/tmp/"`
+  * `JENKINS_ARGS="--webroot=/var/cache/$NAME/war --httpPort=$HTTP_PORT --pluginroot=/var/cache/$NAME/plugins"`
 * `chown -R jenkins:jenkins /var/cache/jenkins`
 * `systemctl start jenkins`
 * `tail -f /var/log/jenkins/jenkins.log`
@@ -93,34 +92,24 @@ EOF
 192.168.32.13 jenkins
 192.168.32.15 agent1
 ```
-* https://adoptopenjdk.net/installation.html#linux-pkg
+* install AdoptOpenJDK 11
+  * `apt-get -y install wget apt-transport-https gnupg`
+  * `wget -qO - https://adoptopenjdk.jfrog.io/adoptopenjdk/api/gpg/key/public | apt-key add -`
+  * `echo "deb https://adoptopenjdk.jfrog.io/adoptopenjdk/deb $(lsb_release -cs) main" | tee /etc/apt/sources.list.d/adoptopenjdk.list`
+  * `apt-get update`
+  * `apt-get -y install adoptopenjdk-11-hotspot fontconfig`
+  * more details: https://adoptopenjdk.net/installation.html#linux-pkg
 
-```
-cat <<'EOF' > /etc/yum.repos.d/adoptopenjdk.repo
-[AdoptOpenJDK]
-name=AdoptOpenJDK
-baseurl=http://adoptopenjdk.jfrog.io/adoptopenjdk/rpm/centos/$releasever/$basearch
-enabled=1
-gpgcheck=1
-gpgkey=https://adoptopenjdk.jfrog.io/adoptopenjdk/api/gpg/key/public
-EOF
-```
-
-* repo to get latest version Git
-  * `yum -y install https://packages.endpoint.com/rhel/7/os/x86_64/endpoint-repo-1.7-1.x86_64.rpm`
-
-* `yum remove git*`
-* `yum -y install adoptopenjdk-11-hotspot git fontconfig wget`
 * install Docker and unzip (https://docs.docker.com/engine/install/centos/)
-  * `yum remove docker docker-client docker-client-latest docker-common docker-latest docker-latest-logrotate docker-logrotate docker-engine`
-  * `yum -y install yum-utils`
-  * `yum-config-manager --add-repo https://download.docker.com/linux/centos/docker-ce.repo`
-  * `yum -y install docker-ce docker-ce-cli containerd.io unzip`
-  * `groupadd docker`
-  * `systemctl enable docker`
-  * `systemctl start docker`
+  * `apt-get remove docker docker-engine docker.io containerd runc`
+  * `apt-get update`
+  * `apt-get -y install apt-transport-https ca-certificates curl gnupg-agent software-properties-common`
+  * `curl -fsSL https://download.docker.com/linux/ubuntu/gpg | apt-key add -`
+  * `echo "deb [arch=amd64] https://download.docker.com/linux/ubuntu $(lsb_release -cs) stable" | tee /etc/apt/sources.list.d/docker-ce.list`
+  * `apt-get update`
+  * `apt-get -y install docker-ce docker-ce-cli containerd.io`
+  * `usermod -a -G docker vagrant`
   * `exit`
-  * `sudo usermod -aG docker $USER`
   * `exit`
   * `vagrant ssh agent1`
   * `docker run hello-world`
