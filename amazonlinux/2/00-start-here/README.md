@@ -18,7 +18,6 @@
 
 * `vagrant ssh jenkins`
 * `sudo su -`
-* `yum -y install wget`
 * create `/etc/security/limits.d/30-jenkins.conf`
   * https://support.cloudbees.com/hc/en-us/articles/222446987-Prepare-Jenkins-for-Support
 
@@ -45,15 +44,12 @@ jenkins hard nproc 30654
 cat <<'EOF' > /etc/yum.repos.d/adoptopenjdk.repo
 [AdoptOpenJDK]
 name=AdoptOpenJDK
-baseurl=http://adoptopenjdk.jfrog.io/adoptopenjdk/rpm/centos/$releasever/$basearch
+baseurl=http://adoptopenjdk.jfrog.io/adoptopenjdk/rpm/centos/8/$basearch
 enabled=1
 gpgcheck=1
 gpgkey=https://adoptopenjdk.jfrog.io/adoptopenjdk/api/gpg/key/public
 EOF
 ```
-
-* repo to get latest version Git
-  * `yum -y install https://packages.endpoint.com/rhel/7/os/x86_64/endpoint-repo-1.7-1.x86_64.rpm`
 
 * Jenkins repo
   * `wget -O /etc/yum.repos.d/jenkins.repo https://pkg.jenkins.io/redhat-stable/jenkins.repo`
@@ -63,7 +59,6 @@ EOF
   * `mkdir -p /var/cache/jenkins/tmp`
   * `mkdir -p /var/cache/jenkins/heapdumps`
 
-* `yum remove git*`
 * `yum -y install adoptopenjdk-11-hotspot git jenkins fontconfig`
 * edit `/etc/sysconfig/jenkins`
   * `JENKINS_JAVA_OPTIONS="-Djava.awt.headless=true -Djava.io.tmpdir=/var/cache/jenkins/tmp/"`
@@ -99,32 +94,24 @@ EOF
 cat <<'EOF' > /etc/yum.repos.d/adoptopenjdk.repo
 [AdoptOpenJDK]
 name=AdoptOpenJDK
-baseurl=http://adoptopenjdk.jfrog.io/adoptopenjdk/rpm/centos/$releasever/$basearch
+baseurl=http://adoptopenjdk.jfrog.io/adoptopenjdk/rpm/centos/8/$basearch
 enabled=1
 gpgcheck=1
 gpgkey=https://adoptopenjdk.jfrog.io/adoptopenjdk/api/gpg/key/public
 EOF
 ```
 
-* repo to get latest version Git
-  * `yum -y install https://packages.endpoint.com/rhel/7/os/x86_64/endpoint-repo-1.7-1.x86_64.rpm`
-
-* `yum remove git*`
-* `yum -y install adoptopenjdk-11-hotspot git fontconfig wget`
-* install Docker and unzip (https://docs.docker.com/engine/install/centos/)
-  * `yum remove docker docker-client docker-client-latest docker-common docker-latest docker-latest-logrotate docker-logrotate docker-engine`
-  * `yum -y install yum-utils`
-  * `yum-config-manager --add-repo https://download.docker.com/linux/centos/docker-ce.repo`
-  * `yum -y install docker-ce docker-ce-cli containerd.io unzip`
-  * `groupadd docker`
-  * `systemctl enable docker`
-  * `systemctl start docker`
-  * `exit`
-  * `sudo usermod -aG docker $USER`
+* `exit`
+* `sudo yum -y install adoptopenjdk-11-hotspot git fontconfig`
+* install Docker
+  * `sudo amazon-linux-extras install docker`
+  * `sudo usermod -a -G docker vagrant`
+  * `sudo chkconfig docker on`
+  * `sudo service docker start`
   * `exit`
   * `vagrant ssh agent1`
   * `docker run hello-world`
-  * `sudo su -`
+* `sudo su -`  
 * install Maven
   * `mkdir -p /opt/tools/maven`
   * `cd /opt/tools/maven`
