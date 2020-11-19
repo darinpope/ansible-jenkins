@@ -100,7 +100,7 @@ jenkins hard nproc 30654
   * `apt-get -y install adoptopenjdk-11-hotspot fontconfig`
   * more details: https://adoptopenjdk.net/installation.html#linux-pkg
 
-* install Docker and unzip (https://docs.docker.com/engine/install/centos/)
+* install Docker and unzip (https://docs.docker.com/engine/install/ubuntu/)
   * `apt-get remove docker docker-engine docker.io containerd runc`
   * `apt-get update`
   * `apt-get -y install apt-transport-https ca-certificates curl gnupg-agent software-properties-common`

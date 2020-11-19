@@ -95,49 +95,44 @@
   hosts: agents
   become: yes
   tasks:
-#    - name: remove any installed docker
-#      apt:
-#        name:
-#          - docker
-#          - docker-client
-#         - docker-client-latest
-#          - docker-common
-#          - docker-latest
-#          - docker-latest-logrotate
-#          - docker-logrotate
-#          - docker-engine
-#        state: absent
-#    - name: docker-ce-stable yum repository
-#      yum_repository:
-#        name: docker-ce-stable
-#        description: Docker CE Stable - $basearch
-#        baseurl: https://download.docker.com/linux/centos/7/$basearch/stable
-#        enabled: yes
-#        gpgcheck: yes
-#        gpgkey: https://download.docker.com/linux/centos/gpg
-#    - name: Install Docker and unzip
-#      apt:
-#        name: 
-#          - docker-ce
-#          - docker-ce-cli
-#          - containerd.io
-#          - unzip
-#        state: latest
-#    - name: add docker group
-#      group:
-#        name: docker
-#        state: present
-#    - name: add $USER to docker group
-#      user: 
-#        name: "{{ ansible_user }}"
-#        groups: docker
-#        append: yes
-#    - name: do a ssh reset in order to reflect the $USER group changes
-#      meta: reset_connection
-#    - name: start Docker service
-#      systemd:
-#        name: docker
-#        state: started        
+    - name: remove any installed docker
+      apt:
+        name:
+          - docker 
+          - docker-engine 
+          - docker.io 
+          - containerd 
+          - runc 
+        state: absent
+    - name: add docker-ce apt key
+      apt_key:
+        url: https://download.docker.com/linux/ubuntu/gpg
+        state: present
+    - name: docker-ce-stable deb repository
+      apt_repository:
+        repo: deb [arch=amd64] https://download.docker.com/linux/ubuntu bionic stable"
+    - name: Install Docker
+      apt:
+        name: 
+          - docker-ce
+          - docker-ce-cli
+          - containerd.io
+        state: latest
+    - name: add docker group
+      group:
+        name: docker
+        state: present
+    - name: add $USER to docker group
+      user: 
+        name: "{{ ansible_user }}"
+        groups: docker
+        append: yes
+    - name: do a ssh reset in order to reflect the $USER group changes
+      meta: reset_connection
+    - name: start Docker service
+      systemd:
+        name: docker
+        state: started        
     - name: create Maven directory
       file: 
         path: "/opt/tools/maven"
@@ -157,11 +152,6 @@
         owner: vagrant
         group: vagrant
         state: link
-    - name: setup Maven profile
-      copy:
-        dest: /etc/profile.d/maven.sh
-        content: |
-          PATH=/opt/tools/maven/latest/bin:$PATH
     - name: create Gradle directory
       file: 
         path: "/opt/tools/gradle"
@@ -181,11 +171,12 @@
         owner: vagrant
         group: vagrant
         state: link
-    - name: setup Gradle profile
-      copy:
-        dest: /etc/profile.d/gradle.sh
-        content: |
-          PATH=/opt/tools/gradle/latest/bin:$PATH
+    - name: Update PATH with Maven and Gradle
+      lineinfile:
+        path: "/etc/environment"
+        regexp: ".*PATH=.*"
+        line: 'PATH="/opt/tools/gradle/latest/bin:/opt/tools/maven/latest/bin:/usr/local/sbin:/usr/local/bin:/usr/sbin:/usr/bin:/sbin:/bin:/usr/games:/usr/local/games:/snap/bin"'
+        state: present
     - name: set final ownership to /opt/tools
       file: 
         path: "/opt/tools"

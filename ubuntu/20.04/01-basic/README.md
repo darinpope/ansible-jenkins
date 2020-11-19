@@ -21,8 +21,24 @@
 
 ## Connect agent to Jenkins
 
-* change master to 0
-* connect agent
+* `Manage Jenkins` -> `Configure System`
+  * # of executors = `0`
+  * Labels = some random string
+  * Usage = `Only build jobs with label expressions matching this node`
+  * Click `Save`
+* `Manage Jenkins` -> `Manage Nodes and Clouds`
+  * `New Node`
+  * Node name = `agent 1`
+    * select "Permanent Agent"
+    * Click `OK`
+  * Remote root directory = `/home/vagrant/jenkins-agent`
+  * Labels = `linux`
+  * Usage = `Only build jobs with label expressions matching this node`
+  * Launch method = `Launch agents via SSH`
+    * Host = `agent1`
+    * add and select `vagrant` credential
+    * Host Key Verification Strategy = `Non verifying Verification Strategy`
+  * Click `Save`
 
 ## Create test job
 
