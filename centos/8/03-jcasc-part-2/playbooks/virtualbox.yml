@@ -43,6 +43,17 @@
 - name: Jenkins installation
   hosts: jenkins_controllers
   tasks:
+    - name: enable and start firewalld service
+      systemd:
+        name: firewalld
+        state: started
+        enabled: yes
+    - name: permit traffic in default zone on port 8080/tcp
+      ansible.posix.firewalld:
+        port: 8080/tcp
+        permanent: yes
+        state: enabled
+        immediate: yes
     - name: jenkins yum repository
       become: yes
       yum_repository:
@@ -123,6 +134,17 @@
   hosts: agents
   become: yes
   tasks:
+    - name: enable and start firewalld service
+      systemd:
+        name: firewalld
+        state: started
+        enabled: yes
+    - name: permit traffic in default zone on port 22/tcp
+      ansible.posix.firewalld:
+        port: 22/tcp
+        permanent: yes
+        state: enabled
+        immediate: yes
     - name: remove any installed docker
       yum:
         name:

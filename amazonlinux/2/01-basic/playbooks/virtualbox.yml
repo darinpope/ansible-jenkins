@@ -27,12 +27,24 @@
           - adoptopenjdk-11-hotspot
           - git
           - unzip
+          - firewalld
         state: latest
       
 - name: Jenkins installation
   hosts: jenkins_controllers
   become: yes
   tasks:
+    - name: enable and start firewalld service
+      systemd:
+        name: firewalld
+        state: started
+        enabled: yes
+    - name: permit traffic in default zone on port 8080/tcp
+      ansible.posix.firewalld:
+        port: 8080/tcp
+        permanent: yes
+        state: enabled
+        immediate: yes
     - name: jenkins yum repository
       yum_repository:
         name: jenkins
@@ -81,6 +93,17 @@
   hosts: agents
   become: yes
   tasks:
+    - name: enable and start firewalld service
+      systemd:
+        name: firewalld
+        state: started
+        enabled: yes
+    - name: permit traffic in default zone on port 22/tcp
+      ansible.posix.firewalld:
+        port: 22/tcp
+        permanent: yes
+        state: enabled
+        immediate: yes
     - name: Install docker-ce (centos) via amazon-linux-extras packages
       shell: "amazon-linux-extras install docker -y"
     - name: add docker group

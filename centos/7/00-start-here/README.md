@@ -33,12 +33,21 @@ jenkins soft nproc 30654
 jenkins hard nproc 30654
 ```
 
+* setup firewalld
+  * `systemctl enable firewalld`
+  * `systemctl start firewalld`
+  * `firewall-cmd --permanent --add-port=22/tcp`
+  * `firewall-cmd --permanent --add-port=8080/tcp`
+  * `firewall-cmd --reload`
+  
 *  add the following entries to `/etc/hosts`:
 
 ```
 192.168.32.13 jenkins
 192.168.32.15 agent1
 ```
+
+
 * https://adoptopenjdk.net/installation.html#linux-pkg
 
 ```
@@ -87,6 +96,12 @@ EOF
 
 * `vagrant ssh agent1`
 * `sudo su -`
+* setup firewalld
+  * `systemctl enable firewalld`
+  * `systemctl start firewalld`
+  * `firewall-cmd --permanent --add-port=22/tcp`
+  * `firewall-cmd --reload`
+
 *  add the following entries to `/etc/hosts`:
 
 ```
