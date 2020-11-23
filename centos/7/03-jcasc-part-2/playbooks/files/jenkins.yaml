@@ -1,13 +1,3 @@
-credentials:
-  system:
-    domainCredentials:
-    - credentials:
-      - usernamePassword:
-          description: "vagrant"
-          id: "vagrant"
-          password: "{AQAAABAAAAAQiHNENDzojEh5TLRLuOvgIBgIdOwKetkQYISxncNmxvE=}"
-          scope: GLOBAL
-          username: "vagrant"
 jenkins:
   agentProtocols:
   - "JNLP4-connect"
@@ -18,6 +8,7 @@ jenkins:
   disableRememberMe: false
   labelAtoms:
   - name: "agent1"
+  - name: "asdfwerf"
   - name: "linux"
   - name: "master"
   labelString: "asdfwerf"
@@ -82,7 +73,7 @@ unclassified:
     defaultTriggerIds:
     - "hudson.plugins.emailext.plugins.trigger.FailureTrigger"
     mailAccount:
-      smtpPassword: "{AQAAABAAAAAQ9p6h/Sgk0zF7eCCk6ZRVyESg1jZzAn5afPqfR8vmM9g=}"
+      smtpPassword: "{AQAAABAAAABAUn9NBHzu+F1dLjzdadt45ZjkcWZqEasl/43X9cYETBua3rG4JHvc/s/mMWSqQVsGi3mqloRDOqUp+7chco3cz1LpxMlLBnmIDgtgetxCyjU=}"
     maxAttachmentSize: -1
     maxAttachmentSizeMb: -1
     precedenceBulk: false
@@ -101,6 +92,20 @@ unclassified:
     hideCredentials: false
     showEntireCommitSummaryInChanges: false
     useExistingAccountWithSameEmail: false
+  globalDefaultFlowDurabilityLevel:
+    durabilityHint: PERFORMANCE_OPTIMIZED
+  globalLibraries:
+    libraries:
+    - defaultVersion: "master"
+      name: "shared-library"
+      retriever:
+        modernSCM:
+          scm:
+            git:
+              id: "946b0602-da88-4c41-8e5a-702363e7254b"
+              remote: "https://github.com/darinpope/github-api-global-lib.git"
+              traits:
+              - "gitBranchDiscovery"
   junitTestResultStorage:
     storage: "file"
   location:

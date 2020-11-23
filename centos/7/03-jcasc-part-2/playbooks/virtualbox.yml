@@ -44,11 +44,13 @@
   hosts: jenkins_controllers
   tasks:
     - name: enable and start firewalld service
+      become: yes
       systemd:
         name: firewalld
         state: started
         enabled: yes
     - name: permit traffic in default zone on port 8080/tcp
+      become: yes
       ansible.posix.firewalld:
         port: 8080/tcp
         permanent: yes
@@ -99,7 +101,7 @@
       become: yes
       copy:
         dest: "/etc/security/limits.d/30-jenkins.conf"
-        src: "30-jenkins.conf"
+        src: "limits.d/30-jenkins.conf"
     - name: download jenkins-plugin-manager
       get_url:
         url: https://github.com/jenkinsci/plugin-installation-manager-tool/releases/download/2.1.3/jenkins-plugin-manager-2.1.3.jar
@@ -113,10 +115,15 @@
       copy:
         dest: "/var/lib/jenkins/jenkins.yaml"
         src: "jenkins.yaml"
+    - name: Copy the init files
+      become: yes
+      copy:
+        dest: "/var/lib/jenkins/init.groovy.d/"
+        src: "init.groovy.d/"
     - name: run the jenkins-plugin-manager
       become: yes
       command: java -jar jenkins-plugin-manager.jar --war /usr/lib/jenkins/jenkins.war --plugin-file plugins.yaml --plugin-download-directory /var/lib/jenkins/plugins
-    - name: update plugin ownership
+    - name: update JENKINS_HOME ownership
       become: yes
       file:
         path: /var/lib/jenkins
