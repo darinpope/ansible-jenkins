@@ -29,7 +29,6 @@ plugins:
   - artifactId: jaxb
   - artifactId: jdk-tool
   - artifactId: jquery3-api
-  - artifactId: jquery-detached
   - artifactId: jsch
   - artifactId: junit
   - artifactId: ldap
@@ -77,4 +76,4 @@ plugins:
   - artifactId: workflow-scm-step
   - artifactId: workflow-step-api
   - artifactId: workflow-support
-  - artifactId: ws-cleanup  
+  - artifactId: ws-cleanup
