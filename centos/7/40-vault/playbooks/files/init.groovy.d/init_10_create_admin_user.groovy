@@ -3,7 +3,6 @@ import hudson.security.*
 
 File disableScript = new File(Jenkins.get().getRootDir(), ".disable-create-admin-user")
 if (disableScript.exists()) {
-    logger.info("DISABLE create admin user")
     return
 }
 

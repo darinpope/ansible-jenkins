@@ -5,7 +5,6 @@ import com.cloudbees.plugins.credentials.CredentialsScope
 
 File disableScript = new File(Jenkins.get().getRootDir(), ".disable-create-vagrant-userpass-credential")
 if (disableScript.exists()) {
-    logger.info("DISABLE create vagrant userpass credential")
     return
 }
 
