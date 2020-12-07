@@ -30,98 +30,6 @@
           - firewalld
         state: latest
       
-- name: Jenkins installation
-  hosts: jenkins_controllers
-  tasks:
-    - name: enable and start firewalld service
-      become: yes
-      systemd:
-        name: firewalld
-        state: started
-        enabled: yes
-    - name: permit traffic in default zone on port 8080/tcp
-      become: yes
-      ansible.posix.firewalld:
-        port: 8080/tcp
-        permanent: yes
-        state: enabled
-        immediate: yes
-    - name: jenkins yum repository
-      become: yes
-      yum_repository:
-        name: jenkins
-        description: Jenkins-stable
-        baseurl: http://pkg.jenkins.io/redhat-stable
-        enabled: yes
-        gpgcheck: yes
-        gpgkey: https://pkg.jenkins.io/redhat-stable/jenkins.io.key
-    - name: Install Jenkins
-      become: yes
-      yum:
-        name:
-          - jenkins-2.263.1
-        state: latest
-    - name: Create directories for Jenkins
-      become: yes
-      file:
-        path: "{{ item }}"
-        state: directory
-        owner: jenkins
-        group: jenkins
-        recurse: yes
-      with_items:
-        - '/var/cache/jenkins/tmp'
-        - '/var/cache/jenkins/heapdumps'
-        - '/var/lib/jenkins/plugins'
-    - name: Update JENKINS_JAVA_OPTIONS
-      become: yes
-      lineinfile:
-        path: "/etc/sysconfig/jenkins"
-        regexp: ".*-Djava.awt.headless=true.*"
-        line: 'JENKINS_JAVA_OPTIONS="-Djava.awt.headless=true -Djenkins.install.runSetupWizard=false -Djava.io.tmpdir=/var/cache/jenkins/tmp/"'
-        state: present
-    - name: Update JENKINS_ARGS
-      become: yes
-      lineinfile:
-        path: "/etc/sysconfig/jenkins"
-        regexp: ".*JENKINS_ARGS=.*"
-        line: 'JENKINS_ARGS="--pluginroot=/var/cache/jenkins/plugins"'
-        state: present
-    - name: Create limits file
-      become: yes
-      copy:
-        dest: "/etc/security/limits.d/30-jenkins.conf"
-        src: "30-jenkins.conf"
-    - name: download jenkins-plugin-manager
-      get_url:
-        url: https://github.com/jenkinsci/plugin-installation-manager-tool/releases/download/2.2.0/jenkins-plugin-manager-2.2.0.jar
-        dest: $HOME/jenkins-plugin-manager.jar
-    - name: Copy the plugins.yaml file
-      copy:
-        dest: "$HOME/plugins.yaml"
-        src: "plugins.yaml"
-    - name: Copy the jenkins.yaml file
-      become: yes
-      copy:
-        dest: "/var/lib/jenkins/jenkins.yaml"
-        src: "jenkins.yaml"
-    - name: run the jenkins-plugin-manager
-      become: yes
-      command: java -jar jenkins-plugin-manager.jar --war /usr/lib/jenkins/jenkins.war --plugin-file plugins.yaml --plugin-download-directory /var/lib/jenkins/plugins
-    - name: update plugin ownership
-      become: yes
-      file:
-        path: /var/lib/jenkins
-        owner: jenkins
-        group: jenkins
-        state: directory
-        recurse: yes
-    - name: start jenkins service
-      become: yes
-      systemd:
-        name: jenkins
-        state: started
-
 - name: Common agent installation
   hosts: agents
   become: yes
@@ -214,3 +122,95 @@
         owner: vagrant
         group: vagrant
         recurse: yes
+
+- name: Jenkins installation
+  hosts: jenkins_controllers
+  tasks:
+    - name: enable and start firewalld service
+      become: yes
+      systemd:
+        name: firewalld
+        state: started
+        enabled: yes
+    - name: permit traffic in default zone on port 8080/tcp
+      become: yes
+      ansible.posix.firewalld:
+        port: 8080/tcp
+        permanent: yes
+        state: enabled
+        immediate: yes
+    - name: jenkins yum repository
+      become: yes
+      yum_repository:
+        name: jenkins
+        description: Jenkins-stable
+        baseurl: http://pkg.jenkins.io/redhat-stable
+        enabled: yes
+        gpgcheck: yes
+        gpgkey: https://pkg.jenkins.io/redhat-stable/jenkins.io.key
+    - name: Install Jenkins
+      become: yes
+      yum:
+        name:
+          - jenkins-2.263.1
+        state: latest
+    - name: Create directories for Jenkins
+      become: yes
+      file:
+        path: "{{ item }}"
+        state: directory
+        owner: jenkins
+        group: jenkins
+        recurse: yes
+      with_items:
+        - '/var/cache/jenkins/tmp'
+        - '/var/cache/jenkins/heapdumps'
+        - '/var/lib/jenkins/plugins'
+    - name: Update JENKINS_JAVA_OPTIONS
+      become: yes
+      lineinfile:
+        path: "/etc/sysconfig/jenkins"
+        regexp: ".*-Djava.awt.headless=true.*"
+        line: 'JENKINS_JAVA_OPTIONS="-Djava.awt.headless=true -Djenkins.install.runSetupWizard=false -Djava.io.tmpdir=/var/cache/jenkins/tmp/"'
+        state: present
+    - name: Update JENKINS_ARGS
+      become: yes
+      lineinfile:
+        path: "/etc/sysconfig/jenkins"
+        regexp: ".*JENKINS_ARGS=.*"
+        line: 'JENKINS_ARGS="--pluginroot=/var/cache/jenkins/plugins"'
+        state: present
+    - name: Create limits file
+      become: yes
+      copy:
+        dest: "/etc/security/limits.d/30-jenkins.conf"
+        src: "30-jenkins.conf"
+    - name: download jenkins-plugin-manager
+      get_url:
+        url: https://github.com/jenkinsci/plugin-installation-manager-tool/releases/download/2.2.0/jenkins-plugin-manager-2.2.0.jar
+        dest: $HOME/jenkins-plugin-manager.jar
+    - name: Copy the plugins.yaml file
+      copy:
+        dest: "$HOME/plugins.yaml"
+        src: "plugins.yaml"
+    - name: Copy the jenkins.yaml file
+      become: yes
+      copy:
+        dest: "/var/lib/jenkins/jenkins.yaml"
+        src: "jenkins.yaml"
+    - name: run the jenkins-plugin-manager
+      become: yes
+      command: java -jar jenkins-plugin-manager.jar --war /usr/lib/jenkins/jenkins.war --plugin-file plugins.yaml --plugin-download-directory /var/lib/jenkins/plugins
+    - name: update plugin ownership
+      become: yes
+      file:
+        path: /var/lib/jenkins
+        owner: jenkins
+        group: jenkins
+        state: directory
+        recurse: yes
+    - name: start jenkins service
+      become: yes
+      systemd:
+        name: jenkins
+        state: started
