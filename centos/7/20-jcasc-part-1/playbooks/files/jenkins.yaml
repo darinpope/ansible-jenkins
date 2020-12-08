@@ -37,10 +37,6 @@ jenkins:
     enabled: true
   scmCheckoutRetryCount: 0
   slaveAgentPort: -1
-  updateCenter:
-    sites:
-    - id: "default"
-      url: "https://updates.jenkins.io/update-center.json"
   views:
   - all:
       name: "all"
