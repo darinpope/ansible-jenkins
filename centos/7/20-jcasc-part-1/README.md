@@ -23,6 +23,7 @@ pipeline {
           mvn --version
           gradle --version
           docker info
+          snyk --version
         """
       }
     }

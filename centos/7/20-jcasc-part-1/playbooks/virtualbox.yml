@@ -75,6 +75,14 @@
         enabled: yes
         gpgcheck: yes
         gpgkey: https://download.docker.com/linux/centos/gpg
+    - name: nodesource-el7 yum repository
+      yum_repository:
+        name: nodesource
+        description: Node.js Packages for Enterprise Linux 7 - $basearch
+        baseurl: https://rpm.nodesource.com/pub_14.x/el/7/$basearch
+        enabled: yes
+        gpgcheck: yes
+        gpgkey: https://rpm.nodesource.com/pub/el/NODESOURCE-GPG-SIGNING-KEY-EL
     - name: Install Docker and unzip
       yum:
         name: 
@@ -82,6 +90,9 @@
           - docker-ce-cli
           - containerd.io
           - unzip
+          - gcc-c++ 
+          - make 
+          - nodejs
         state: latest
     - name: add docker group
       group:
@@ -103,6 +114,10 @@
   hosts: agents
   become: yes
   tasks:
+    - name: Install "snyk" node.js package globally
+      community.general.npm:
+        name: snyk
+        global: yes
     - name: create Maven directory
       file: 
         path: "/opt/tools/maven"
