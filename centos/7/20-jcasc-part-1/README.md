@@ -48,7 +48,7 @@ pipeline {
     stage("Snyk scan") {
       steps {
         sh '''
-          snyk auth
+          snyk auth $SNYK_TOKEN
           snyk test
         '''
       }
