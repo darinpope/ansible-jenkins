@@ -31,6 +31,38 @@ pipeline {
 }
 ```
 
+## Create git-client-plugin job
+
+```
+pipeline {
+  agent {label "linux"}
+  environment {
+    SNYK_TOKEN = credentials("snyk-token")
+  }
+  stages {
+    stage("checkout") {
+      steps {
+        git 'https://github.com/darinpope/git-client-plugin.git'
+      }
+    }
+    stage("Snyk scan") {
+      steps {
+        sh '''
+          snyk auth
+          snyk test
+        '''
+      }
+    }
+    stage("Maven ") {
+      steps {
+        sh """
+          mvn clean install
+        """
+      }
+    }
+  }
+}
+```
 
 ## Cleanup
 
