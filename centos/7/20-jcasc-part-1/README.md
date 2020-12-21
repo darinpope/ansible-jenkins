@@ -30,33 +30,61 @@ pipeline {
   }
 }
 ```
-
-## Create git-client-plugin job
+## Create prometheus-plugin job using Snyk CLI
 
 ```
 pipeline {
   agent {label "linux"}
   environment {
-    SNYK_TOKEN = credentials("snyk-token")
+    SNYK_TOKEN = credentials("snyk-api-token")
   }
   stages {
     stage("checkout") {
       steps {
-        git 'https://github.com/darinpope/git-client-plugin.git'
+        git 'https://github.com/darinpope/prometheus-plugin.git'
       }
     }
     stage("Snyk scan") {
       steps {
         sh '''
           snyk auth $SNYK_TOKEN
-          snyk test
+          snyk test || exit 0
         '''
       }
     }
     stage("Maven ") {
       steps {
         sh """
-          mvn clean verify
+          mvn clean install
+          mvn hpi:hpi
+        """
+      }
+    }
+  }
+}
+```
+
+## Create prometheus-plugin job using Snyk plugin
+
+```
+pipeline {
+  agent {label "linux"}
+  stages {
+    stage("checkout") {
+      steps {
+        git 'https://github.com/darinpope/prometheus-plugin.git'
+      }
+    }
+    stage("Snyk scan") {
+      steps {
+        snykSecurity failOnIssues: false, snykInstallation: 'snyk@latest', snykTokenId: 'snyk-api-token'
+      }
+    }
+    stage("Maven ") {
+      steps {
+        sh """
+          mvn clean install
+          mvn hpi:hpi
         """
       }
     }

@@ -75,14 +75,6 @@
         enabled: yes
         gpgcheck: yes
         gpgkey: https://download.docker.com/linux/centos/gpg
-    - name: nodesource-el7 yum repository
-      yum_repository:
-        name: nodesource
-        description: Node.js Packages for Enterprise Linux 7 - $basearch
-        baseurl: https://rpm.nodesource.com/pub_14.x/el/7/$basearch
-        enabled: yes
-        gpgcheck: yes
-        gpgkey: https://rpm.nodesource.com/pub/el/NODESOURCE-GPG-SIGNING-KEY-EL
     - name: Install Docker and unzip
       yum:
         name: 
@@ -90,9 +82,6 @@
           - docker-ce-cli
           - containerd.io
           - unzip
-          - gcc-c++ 
-          - make 
-          - nodejs
         state: latest
     - name: add docker group
       group:
@@ -114,10 +103,6 @@
   hosts: agents
   become: yes
   tasks:
-    - name: Install "snyk" node.js package globally
-      community.general.npm:
-        name: snyk
-        global: yes
     - name: create Maven directory
       file: 
         path: "/opt/tools/maven"
@@ -166,6 +151,30 @@
         dest: /etc/profile.d/gradle.sh
         content: |
           PATH=/opt/tools/gradle/latest/bin:$PATH
+    - name: create Snyk directory
+      file: 
+        path: "/opt/tools/snyk/v1.437.2"
+        state: directory
+        owner: vagrant
+        group: vagrant
+        recurse: yes
+    - name: download Snyk v1.437.2
+      get_url:
+        url: https://github.com/snyk/snyk/releases/download/v1.437.2/snyk-linux
+        dest: /opt/tools/snyk/v1.437.2/snyk
+        mode: '0755'
+    - name: create Snyk latest symlink
+      file: 
+        src: /opt/tools/snyk/v1.437.2
+        dest: /opt/tools/snyk/latest
+        owner: vagrant
+        group: vagrant
+        state: link
+    - name: setup Snyk profile
+      copy:
+        dest: /etc/profile.d/snyk.sh
+        content: |
+          PATH=/opt/tools/snyk/latest:$PATH
     - name: set final ownership to /opt/tools
       file: 
         path: "/opt/tools"
