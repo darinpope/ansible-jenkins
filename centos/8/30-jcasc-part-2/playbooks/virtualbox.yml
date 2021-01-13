@@ -233,7 +233,7 @@
         src: "jenkins.yaml"
     - name: run the jenkins-plugin-manager
       become: yes
-      command: java -jar jenkins-plugin-manager.jar --war /usr/lib/jenkins/jenkins.war --plugin-file plugins.yaml --plugin-download-directory /var/lib/jenkins/plugins
+      command: java -jar jenkins-plugin-manager.jar --jenkins-version 2.263.2 --plugin-file plugins.yaml --plugin-download-directory /var/lib/jenkins/plugins
     - name: update plugin ownership
       become: yes
       file:
