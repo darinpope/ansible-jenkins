@@ -10,19 +10,19 @@ plugins:
   - artifactId: cloudbees-folder
   - artifactId: command-launcher
   - artifactId: configuration-as-code
-  - artifactId: credentials-binding
   - artifactId: credentials
+  - artifactId: credentials-binding
   - artifactId: display-url-api
   - artifactId: durable-task
   - artifactId: echarts-api
   - artifactId: email-ext
   - artifactId: font-awesome-api
+  - artifactId: git
   - artifactId: git-client
+  - artifactId: git-server
+  - artifactId: github
   - artifactId: github-api
   - artifactId: github-branch-source
-  - artifactId: github
-  - artifactId: git
-  - artifactId: git-server
   - artifactId: handlebars
   - artifactId: jackson2-api
   - artifactId: jaxb
@@ -67,8 +67,8 @@ plugins:
   - artifactId: workflow-aggregator
   - artifactId: workflow-api
   - artifactId: workflow-basic-steps
-  - artifactId: workflow-cps-global-lib
   - artifactId: workflow-cps
+  - artifactId: workflow-cps-global-lib
   - artifactId: workflow-durable-task-step
   - artifactId: workflow-job
   - artifactId: workflow-multibranch
@@ -76,4 +76,4 @@ plugins:
   - artifactId: workflow-step-api
   - artifactId: workflow-support
   - artifactId: ws-cleanup
-  - artifactId: snyk-security-scanner
+  - artifactId: snyk-security-scanner  
