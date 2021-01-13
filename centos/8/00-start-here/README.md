@@ -135,10 +135,10 @@ EOF
 * install Gradle
   * `mkdir -p /opt/tools/gradle`
   * `cd /opt/tools/gradle`
-  * `wget https://services.gradle.org/distributions/gradle-6.6.1-bin.zip`
-  * `unzip gradle-6.6.1-bin.zip`
-  * `rm -f gradle-6.6.1-bin.zip`
-  * `ln -s gradle-6.6.1 latest`
+  * `wget https://services.gradle.org/distributions/gradle-6.8-bin.zip`
+  * `unzip gradle-6.8-bin.zip`
+  * `rm -f gradle-6.8-bin.zip`
+  * `ln -s gradle-6.8 latest`
 * `echo "PATH=/opt/tools/gradle/latest/bin:\$PATH" > /etc/profile.d/gradle.sh`
 * `echo "PATH=/opt/tools/maven/latest/bin:\$PATH" > /etc/profile.d/maven.sh`
 * `chown -R vagrant:vagrant /opt/tools`

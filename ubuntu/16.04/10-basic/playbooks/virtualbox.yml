@@ -177,14 +177,14 @@
         owner: vagrant
         group: vagrant
         recurse: yes
-    - name: download Gradle 6.6.1
+    - name: download Gradle 6.8
       unarchive:
-        src: https://services.gradle.org/distributions/gradle-6.6.1-bin.zip
+        src: https://services.gradle.org/distributions/gradle-6.8-bin.zip
         dest: /opt/tools/gradle
         remote_src: yes
     - name: create Gradle latest symlink
       file: 
-        src: /opt/tools/gradle/gradle-6.6.1
+        src: /opt/tools/gradle/gradle-6.8
         dest: /opt/tools/gradle/latest
         owner: vagrant
         group: vagrant
