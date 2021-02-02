@@ -1,0 +1,140 @@
+---
+- name: Install base software on all
+  hosts: all
+  gather_facts: yes
+  become: yes
+  tasks:
+    - name: update hosts
+      lineinfile:
+        path: "/etc/hosts"
+        regexp: ".*\t{{ hostvars[item]['ansible_hostname']}}\t{{ hostvars[item]['ansible_hostname']}}"
+        line: "{{ hostvars[item]['ansible_ssh_host'] }}\t{{ hostvars[item]['ansible_hostname']}}\t{{ hostvars[item]['ansible_hostname']}}"
+        state: present
+        backup: yes
+      with_items: "{{ ansible_play_batch }}"       
+    - name: AdoptOpenJDK yum repository
+      yum_repository:
+        name: AdoptOpenJDK
+        description: AdoptOpenJDK
+        baseurl: http://adoptopenjdk.jfrog.io/adoptopenjdk/rpm/centos/$releasever/$basearch
+        enabled: yes
+        gpgcheck: yes
+        gpgkey: https://adoptopenjdk.jfrog.io/adoptopenjdk/api/gpg/key/public
+    - name: Endpoint yum repository
+      yum_repository:
+        name: endpoint
+        description: End Point repository
+        baseurl: https://packages.endpoint.com/rhel/$releasever/os/$basearch/
+        enabled: yes
+        gpgcheck: yes
+        gpgkey: https://packages.endpoint.com/endpoint-rpmsign-7.pub
+    - name: remove any installed git
+      yum:
+        name: git
+        state: absent
+    - name: Install fontconfig, AdoptOpenJDK and git
+      yum:
+        name:
+          - fontconfig
+          - adoptopenjdk-8-hotspot
+          - git
+          - wget
+        state: latest
+
+- name: Nexus installation
+  hosts: nexus_servers
+  become: yes
+  gather_facts: yes
+  tasks:
+    - name: install yum repository
+      get_url:
+        url: "https://bintray.com/jfrog/artifactory-rpms/rpm"
+        dest: /etc/yum.repos.d/bintray-jfrog-artifactory-oss-rpms.repo
+    - name: install
+      yum:
+        name:
+          - jfrog-artifactory-oss
+        state: present
+    - name: create data directory
+      file:
+        path: "/data"
+        state: directory
+        mode: "0755"
+        owner: artifactory
+        group: artifactory      
+    - name: Create binarystore.xml file
+      copy:
+        dest: "/opt/jfrog/artifactory/app/misc/etc/artifactory/binarystore.xml"
+        src: "binarystore.xml"
+    - name: set logs ownership
+      file:
+        path: "/opt/jfrog/artifactory/var/log"
+        state: directory
+        mode: "0755"
+        owner: artifactory
+        group: artifactory
+    - name: start and enable artifactory
+      service:
+        name: artifactory
+        state: started
+        enabled: yes
+
+#- name: Jenkins installation
+#  hosts: jenkins_controllers
+#  become: yes
+#  tasks:
+#    - name: enable and start firewalld service
+#      systemd:
+#        name: firewalld
+#        state: started
+#        enabled: yes
+#    - name: permit traffic in default zone on port 8080/tcp
+#      ansible.posix.firewalld:
+#        port: 8080/tcp
+#        permanent: yes
+#        state: enabled
+#        immediate: yes
+#    - name: jenkins yum repository
+#      yum_repository:
+#        name: jenkins
+#        description: Jenkins-stable
+#        baseurl: http://pkg.jenkins.io/redhat-stable
+#        enabled: yes
+#        gpgcheck: yes
+#        gpgkey: https://pkg.jenkins.io/redhat-stable/jenkins.io.key
+#    - name: Install Jenkins
+#      yum:
+#        name:
+#          - jenkins-2.263.3
+#        state: latest
+#    - name: Create directories for Jenkins
+#      file:
+#        path: "{{ item }}"
+#        state: directory
+#        owner: jenkins
+#        group: jenkins
+#        recurse: yes
+#      with_items:
+#        - '/var/cache/jenkins/tmp'
+#        - '/var/cache/jenkins/heapdumps'
+#    - name: Update JENKINS_JAVA_OPTIONS
+#      lineinfile:
+#        path: "/etc/sysconfig/jenkins"
+#        regexp: ".*-Djava.awt.headless=true.*"
+#        line: 'JENKINS_JAVA_OPTIONS="-Djava.awt.headless=true -Djava.io.tmpdir=/var/cache/jenkins/tmp/"'
+#        state: present
+#    - name: Update JENKINS_ARGS
+#      lineinfile:
+#        path: "/etc/sysconfig/jenkins"
+#        regexp: ".*JENKINS_ARGS=.*"
+#        line: 'JENKINS_ARGS="--pluginroot=/var/cache/jenkins/plugins"'
+#        state: present
+#    - name: Create limits file
+#      copy:
+#        dest: "/etc/security/limits.d/30-jenkins.conf"
+#        src: "30-jenkins.conf"
+#    - name: start jenkins service
+#      systemd:
+#        name: jenkins
+#        state: started
+

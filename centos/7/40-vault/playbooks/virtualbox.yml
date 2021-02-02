@@ -129,14 +129,14 @@
         owner: vagrant
         group: vagrant
         recurse: yes
-    - name: download Gradle 6.8
+    - name: download Gradle 6.8.1
       unarchive:
-        src: https://services.gradle.org/distributions/gradle-6.8-bin.zip
+        src: https://services.gradle.org/distributions/gradle-6.8.1-bin.zip
         dest: /opt/tools/gradle
         remote_src: yes
     - name: create Gradle latest symlink
       file: 
-        src: /opt/tools/gradle/gradle-6.8
+        src: /opt/tools/gradle/gradle-6.8.1
         dest: /opt/tools/gradle/latest
         owner: vagrant
         group: vagrant
@@ -209,7 +209,7 @@
       become: yes
       yum:
         name:
-          - jenkins-2.263.2
+          - jenkins-2.263.3
         state: latest
     - name: Create directories for Jenkins
       become: yes
@@ -262,7 +262,7 @@
         src: "init.groovy.d/"
     - name: run the jenkins-plugin-manager
       become: yes
-      command: java -jar jenkins-plugin-manager.jar --jenkins-version 2.263.2 --plugin-file plugins.yaml --plugin-download-directory /var/lib/jenkins/plugins
+      command: java -jar jenkins-plugin-manager.jar --jenkins-version 2.263.3 --plugin-file plugins.yaml --plugin-download-directory /var/lib/jenkins/plugins
     - name: update JENKINS_HOME ownership
       become: yes
       file:
