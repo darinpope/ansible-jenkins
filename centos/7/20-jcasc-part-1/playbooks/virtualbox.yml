@@ -153,19 +153,19 @@
           PATH=/opt/tools/gradle/latest/bin:$PATH
     - name: create Snyk directory
       file: 
-        path: "/opt/tools/snyk/v1.440.4"
+        path: "/opt/tools/snyk/v1.449.0"
         state: directory
         owner: vagrant
         group: vagrant
         recurse: yes
-    - name: download Snyk v1.440.4
+    - name: download Snyk v1.449.0
       get_url:
-        url: https://github.com/snyk/snyk/releases/download/v1.440.4/snyk-linux
-        dest: /opt/tools/snyk/v1.440.4/snyk
+        url: https://github.com/snyk/snyk/releases/download/v1.449.0/snyk-linux
+        dest: /opt/tools/snyk/v1.449.0/snyk
         mode: '0755'
     - name: create Snyk latest symlink
       file: 
-        src: /opt/tools/snyk/v1.440.4
+        src: /opt/tools/snyk/v1.449.0
         dest: /opt/tools/snyk/latest
         owner: vagrant
         group: vagrant
@@ -212,7 +212,7 @@
       become: yes
       yum:
         name:
-          - jenkins-2.263.3
+          - jenkins-2.263.4
         state: latest
     - name: Create directories for Jenkins
       become: yes
@@ -265,7 +265,7 @@
         src: "init.groovy.d/"
     - name: run the jenkins-plugin-manager
       become: yes
-      command: java -jar jenkins-plugin-manager.jar --jenkins-version 2.263.3 --plugin-file plugins.yaml --plugin-download-directory /var/lib/jenkins/plugins
+      command: java -jar jenkins-plugin-manager.jar --jenkins-version 2.263.4 --plugin-file plugins.yaml --plugin-download-directory /var/lib/jenkins/plugins
     - name: update JENKINS_HOME ownership
       become: yes
       file:

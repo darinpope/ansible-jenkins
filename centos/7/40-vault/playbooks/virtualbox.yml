@@ -209,7 +209,7 @@
       become: yes
       yum:
         name:
-          - jenkins-2.263.3
+          - jenkins-2.263.4
         state: latest
     - name: Create directories for Jenkins
       become: yes
@@ -262,7 +262,7 @@
         src: "init.groovy.d/"
     - name: run the jenkins-plugin-manager
       become: yes
-      command: java -jar jenkins-plugin-manager.jar --jenkins-version 2.263.3 --plugin-file plugins.yaml --plugin-download-directory /var/lib/jenkins/plugins
+      command: java -jar jenkins-plugin-manager.jar --jenkins-version 2.263.4 --plugin-file plugins.yaml --plugin-download-directory /var/lib/jenkins/plugins
     - name: update JENKINS_HOME ownership
       become: yes
       file:
