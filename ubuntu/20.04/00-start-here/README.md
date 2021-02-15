@@ -65,7 +65,7 @@ jenkins hard nproc 30654
 * `rm -rf /var/cache/jenkins/war`
 * `rm -f /var/log/jenkins/jenkins.log`
 * edit `/etc/default/jenkins`
-  * `JAVA_ARGS="-Djava.awt.headless=true -Djava.io.tmpdir=/var/cache/$NAME/tmp/"`
+  * `JAVA_ARGS="-Djava.awt.headless=true -Djava.io.tmpdir=/var/cache/$NAME/tmp/ -Dorg.apache.commons.jelly.tags.fmt.timeZone=America/New_York -Duser.timezone=America/New_York"`
   * `JENKINS_ARGS="--webroot=/var/cache/$NAME/war --httpPort=$HTTP_PORT --pluginroot=/var/cache/$NAME/plugins"`
 * `chown -R jenkins:jenkins /var/cache/jenkins`
 * `systemctl start jenkins`

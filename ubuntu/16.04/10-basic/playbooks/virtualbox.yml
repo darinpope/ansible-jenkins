@@ -83,7 +83,7 @@
       lineinfile:
         path: "/etc/default/jenkins"
         regexp: ".*-Djava.awt.headless=true.*"
-        line: 'JAVA_ARGS="-Djava.awt.headless=true -Djava.io.tmpdir=/var/cache/$NAME/tmp/"'
+        line: 'JAVA_ARGS="-Djava.awt.headless=true -Djava.io.tmpdir=/var/cache/$NAME/tmp/ -Dorg.apache.commons.jelly.tags.fmt.timeZone=America/New_York -Duser.timezone=America/New_York"'
         state: present
     - name: Update JENKINS_ARGS
       lineinfile:

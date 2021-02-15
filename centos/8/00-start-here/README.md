@@ -66,7 +66,7 @@ EOF
 * `yum remove git*`
 * `yum -y install adoptopenjdk-11-hotspot git jenkins fontconfig`
 * edit `/etc/sysconfig/jenkins`
-  * `JENKINS_JAVA_OPTIONS="-Djava.awt.headless=true -Djava.io.tmpdir=/var/cache/jenkins/tmp/"`
+  * `JENKINS_JAVA_OPTIONS="-Djava.awt.headless=true -Djava.io.tmpdir=/var/cache/jenkins/tmp/ -Dorg.apache.commons.jelly.tags.fmt.timeZone=America/New_York -Duser.timezone=America/New_York"`
   * `JENKINS_ARGS="--pluginroot=/var/cache/jenkins/plugins"`
 * `chown -R jenkins:jenkins /var/cache/jenkins`
 * `systemctl start jenkins`
