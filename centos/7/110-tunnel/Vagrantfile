@@ -1,10 +1,10 @@
 Vagrant.configure(2) do |config|
   config.vm.box = "bento/centos-7.9"
 
-  config.vm.define "smee" do |smee|
-    smee.vm.network "private_network", ip: "192.168.32.11"
-    smee.vm.hostname = "smee"
-    smee.vm.provider "smee" do |vb|
+  config.vm.define "tunnel" do |tunnel|
+    tunnel.vm.network "private_network", ip: "192.168.32.11"
+    tunnel.vm.hostname = "tunnel"
+    tunnel.vm.provider "tunnel" do |vb|
       vb.cpus = 1
       vb.memory = 1024
     end

@@ -115,8 +115,8 @@
         state: enabled
         immediate: yes
 
-- name: Smee installation
-  hosts: smees
+- name: Tunnel installation
+  hosts: tunnels
   become: yes
   tasks:
     - name: enable and start firewalld service
@@ -130,12 +130,40 @@
         permanent: yes
         state: enabled
         immediate: yes
-    - name: setup npm repo
+    - name: setup npm repo for Smee
       ansible.builtin.shell: curl -fsSL https://rpm.nodesource.com/setup_lts.x | sudo bash -
-    - name: install JDK
+    - name: install NodeJS and unzip
       yum:
         name:
           - nodejs
+          - unzip
         state: latest    
-    - name: install smee
+    - name: install smee CLI
       ansible.builtin.shell: npm install --global smee-client
+    - name: create Ngrok directory
+      file: 
+        path: "/opt/tools/ngrok/stable/bin"
+        state: directory
+        owner: vagrant
+        group: vagrant
+        recurse: yes
+    - name: download Ngrok stable
+      unarchive:
+        src: https://bin.equinox.io/c/4VmDzA7iaHb/ngrok-stable-linux-amd64.zip
+        dest: /opt/tools/ngrok/stable/bin
+        remote_src: yes
+    - name: setup Ngrok profile
+      copy:
+        dest: /etc/profile.d/ngrok.sh
+        content: |
+          PATH=/opt/tools/ngrok/stable/bin:$PATH
+    - name: set final ownership to /opt/tools
+      file: 
+        path: "/opt/tools"
+        state: directory
+        owner: vagrant
+        group: vagrant
+        recurse: yes    
+
+    
+
