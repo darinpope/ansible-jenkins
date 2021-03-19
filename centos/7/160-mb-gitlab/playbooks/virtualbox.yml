@@ -1,0 +1,161 @@
+---
+- name: Install base software on all
+  hosts: all
+  gather_facts: yes
+  become: yes
+  tasks:
+    - name: update hosts
+      lineinfile:
+        path: "/etc/hosts"
+        regexp: ".*\t{{ hostvars[item]['ansible_hostname']}}\t{{ hostvars[item]['ansible_hostname']}}"
+        line: "{{ hostvars[item]['ansible_ssh_host'] }}\t{{ hostvars[item]['ansible_hostname']}}\t{{ hostvars[item]['ansible_hostname']}}"
+        state: present
+        backup: yes
+      with_items: "{{ ansible_play_batch }}"       
+    - name: AdoptOpenJDK yum repository
+      yum_repository:
+        name: AdoptOpenJDK
+        description: AdoptOpenJDK
+        baseurl: http://adoptopenjdk.jfrog.io/adoptopenjdk/rpm/centos/$releasever/$basearch
+        enabled: yes
+        gpgcheck: yes
+        gpgkey: https://adoptopenjdk.jfrog.io/adoptopenjdk/api/gpg/key/public
+    - name: Endpoint yum repository
+      yum_repository:
+        name: endpoint
+        description: End Point repository
+        baseurl: https://packages.endpoint.com/rhel/$releasever/os/$basearch/
+        enabled: yes
+        gpgcheck: yes
+        gpgkey: https://packages.endpoint.com/endpoint-rpmsign-7.pub
+    - name: remove any installed git
+      yum:
+        name: git
+        state: absent
+    - name: Install git
+      yum:
+        name:
+          - git
+          - fontconfig
+          - adoptopenjdk-11-hotspot
+        state: latest
+      
+- name: Jenkins installation
+  hosts: jenkins_controllers
+  become: yes
+  tasks:
+    - name: enable and start firewalld service
+      systemd:
+        name: firewalld
+        state: started
+        enabled: yes
+    - name: permit traffic in default zone on port 8080/tcp
+      ansible.posix.firewalld:
+        port: 8080/tcp
+        permanent: yes
+        state: enabled
+        immediate: yes
+    - name: jenkins yum repository
+      yum_repository:
+        name: jenkins
+        description: Jenkins-stable
+        baseurl: http://pkg.jenkins.io/redhat-stable
+        enabled: yes
+        gpgcheck: yes
+        gpgkey: https://pkg.jenkins.io/redhat-stable/jenkins.io.key
+    - name: Install JDK and Jenkins
+      yum:
+        name:
+          - jenkins-2.277.1
+        state: latest
+    - name: Create directories for Jenkins
+      file:
+        path: "{{ item }}"
+        state: directory
+        owner: jenkins
+        group: jenkins
+        recurse: yes
+      with_items:
+        - '/var/cache/jenkins/tmp'
+        - '/var/cache/jenkins/heapdumps'
+    - name: Update JENKINS_JAVA_OPTIONS
+      lineinfile:
+        path: "/etc/sysconfig/jenkins"
+        regexp: ".*-Djava.awt.headless=true.*"
+        line: 'JENKINS_JAVA_OPTIONS="-Djava.awt.headless=true -Djava.io.tmpdir=/var/cache/jenkins/tmp/ -Dorg.apache.commons.jelly.tags.fmt.timeZone=America/New_York -Duser.timezone=America/New_York"'
+        state: present
+    - name: Update JENKINS_ARGS
+      lineinfile:
+        path: "/etc/sysconfig/jenkins"
+        regexp: ".*JENKINS_ARGS=.*"
+        line: 'JENKINS_ARGS="--pluginroot=/var/cache/jenkins/plugins"'
+        state: present
+    - name: Create limits file
+      copy:
+        dest: "/etc/security/limits.d/30-jenkins.conf"
+        src: "30-jenkins.conf"
+    - name: start jenkins service
+      systemd:
+        name: jenkins
+        state: started
+
+- name: Agent installation
+  hosts: agents
+  become: yes
+  tasks:
+    - name: enable and start firewalld service
+      systemd:
+        name: firewalld
+        state: started
+        enabled: yes
+    - name: permit traffic in default zone on port 22/tcp
+      ansible.posix.firewalld:
+        port: 22/tcp
+        permanent: yes
+        state: enabled
+        immediate: yes
+
+- name: Tunnel installation
+  hosts: tunnels
+  become: yes
+  tasks:
+    - name: enable and start firewalld service
+      systemd:
+        name: firewalld
+        state: started
+        enabled: yes
+    - name: permit traffic in default zone on port 22/tcp
+      ansible.posix.firewalld:
+        port: 22/tcp
+        permanent: yes
+        state: enabled
+        immediate: yes
+    - name: install unzip
+      yum:
+        name:
+          - unzip
+        state: latest    
+    - name: create Ngrok directory
+      file: 
+        path: "/opt/tools/ngrok/stable/bin"
+        state: directory
+        owner: vagrant
+        group: vagrant
+        recurse: yes
+    - name: download Ngrok stable
+      unarchive:
+        src: https://bin.equinox.io/c/4VmDzA7iaHb/ngrok-stable-linux-amd64.zip
+        dest: /opt/tools/ngrok/stable/bin
+        remote_src: yes
+    - name: setup Ngrok profile
+      copy:
+        dest: /etc/profile.d/ngrok.sh
+        content: |
+          PATH=/opt/tools/ngrok/stable/bin:$PATH
+    - name: set final ownership to /opt/tools
+      file: 
+        path: "/opt/tools"
+        state: directory
+        owner: vagrant
+        group: vagrant
+        recurse: yes
