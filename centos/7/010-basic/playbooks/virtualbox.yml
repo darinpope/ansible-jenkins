@@ -38,6 +38,7 @@
           - fontconfig
           - adoptopenjdk-11-hotspot
           - git
+          - wget
         state: latest
       
 - name: Jenkins installation
