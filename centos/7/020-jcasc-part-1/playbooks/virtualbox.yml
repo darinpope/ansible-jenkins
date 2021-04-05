@@ -247,7 +247,7 @@
         src: "limits.d/30-jenkins.conf"
     - name: download jenkins-plugin-manager
       get_url:
-        url: https://github.com/jenkinsci/plugin-installation-manager-tool/releases/download/2.5.0/jenkins-plugin-manager-2.5.0.jar
+        url: https://github.com/jenkinsci/plugin-installation-manager-tool/releases/download/2.5.0/jenkins-plugin-manager-2.9.0.jar
         dest: $HOME/jenkins-plugin-manager.jar
     - name: Copy the plugins.yaml file
       copy:
