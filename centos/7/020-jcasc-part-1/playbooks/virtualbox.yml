@@ -212,7 +212,7 @@
       become: yes
       yum:
         name:
-          - jenkins-2.277.1
+          - jenkins-2.277.2
         state: latest
     - name: Create directories for Jenkins
       become: yes
