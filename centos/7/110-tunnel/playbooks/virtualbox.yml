@@ -157,6 +157,23 @@
         dest: /etc/profile.d/ngrok.sh
         content: |
           PATH=/opt/tools/ngrok/stable/bin:$PATH
+    - name: create cloudflared directory
+      file: 
+        path: "/opt/tools/cloudflared/bin"
+        state: directory
+        owner: vagrant
+        group: vagrant
+        recurse: yes
+    - name: download cloudflared
+      unarchive:
+        src: https://bin.equinox.io/c/VdrWdbjqyF/cloudflared-stable-linux-amd64.tgz
+        dest: /opt/tools/cloudflared/bin
+        remote_src: yes
+    - name: setup cloudflared profile
+      copy:
+        dest: /etc/profile.d/cloudflared.sh
+        content: |
+          PATH=/opt/tools/cloudflared/bin:$PATH
     - name: set final ownership to /opt/tools
       file: 
         path: "/opt/tools"
