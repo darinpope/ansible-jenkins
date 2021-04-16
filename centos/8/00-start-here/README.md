@@ -128,16 +128,16 @@ EOF
 * install Maven
   * `mkdir -p /opt/tools/maven`
   * `cd /opt/tools/maven`
-  * `wget https://mirrors.sonic.net/apache/maven/maven-3/3.6.3/binaries/apache-maven-3.6.3-bin.tar.gz`
-  * `tar zxvf apache-maven-3.6.3-bin.tar.gz`
-  * `rm -f apache-maven-3.6.3-bin.tar.gz`
-  * `ln -s apache-maven-3.6.3 latest`
+  * `wget https://mirrors.sonic.net/apache/maven/maven-3/3.8.1/binaries/apache-maven-3.8.1-bin.tar.gz`
+  * `tar zxvf apache-maven-3.8.1-bin.tar.gz`
+  * `rm -f apache-maven-3.8.1-bin.tar.gz`
+  * `ln -s apache-maven-3.8.1 latest`
 * install Gradle
   * `mkdir -p /opt/tools/gradle`
   * `cd /opt/tools/gradle`
-  * `wget https://services.gradle.org/distributions/gradle-6.8.1-bin.zip`
-  * `unzip gradle-6.8.1-bin.zip`
-  * `rm -f gradle-6.8.1-bin.zip`
+  * `wget https://services.gradle.org/distributions/gradle-7.0-bin.zip`
+  * `unzip gradle-7.0-bin.zip`
+  * `rm -f gradle-7.0-bin.zip`
   * `ln -s gradle-6.8 latest`
 * `echo "PATH=/opt/tools/gradle/latest/bin:\$PATH" > /etc/profile.d/gradle.sh`
 * `echo "PATH=/opt/tools/maven/latest/bin:\$PATH" > /etc/profile.d/maven.sh`
