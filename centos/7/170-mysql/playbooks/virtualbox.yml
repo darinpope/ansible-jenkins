@@ -32,12 +32,14 @@
       yum:
         name: git
         state: absent
-    - name: Install git
+    - name: Install common software
       yum:
         name:
           - git
           - fontconfig
           - adoptopenjdk-11-hotspot
+          - wget
+          - epel-release
         state: latest
       
 - name: Jenkins installation
@@ -114,9 +116,23 @@
         permanent: yes
         state: enabled
         immediate: yes
+    - name: MariaDB yum repository
+      yum_repository:
+        name: MariaDB
+        description: MariaDB
+        baseurl: http://yum.mariadb.org/10.5.9/centos$releasever-amd64
+        enabled: yes
+        gpgcheck: yes
+        gpgkey: https://yum.mariadb.org/RPM-GPG-KEY-MariaDB
+    - name: Install tools
+      yum:
+        name:
+          - MariaDB
+          - jq
+        state: latest
 
-- name: Tunnel installation
-  hosts: tunnels
+- name: MariaDB installation
+  hosts: mariadbs
   become: yes
   tasks:
     - name: enable and start firewalld service
@@ -130,32 +146,26 @@
         permanent: yes
         state: enabled
         immediate: yes
-    - name: install unzip
+    - name: permit traffic in default zone on port 3306/tcp
+      ansible.posix.firewalld:
+        port: 3306/tcp
+        permanent: yes
+        state: enabled
+        immediate: yes
+    - name: MariaDB yum repository
+      yum_repository:
+        name: MariaDB
+        description: MariaDB
+        baseurl: http://yum.mariadb.org/10.5.9/centos$releasever-amd64
+        enabled: yes
+        gpgcheck: yes
+        gpgkey: https://yum.mariadb.org/RPM-GPG-KEY-MariaDB
+    - name: Install MariaDB server
       yum:
         name:
-          - unzip
-        state: latest    
-    - name: create Ngrok directory
-      file: 
-        path: "/opt/tools/ngrok/stable/bin"
-        state: directory
-        owner: vagrant
-        group: vagrant
-        recurse: yes
-    - name: download Ngrok stable
-      unarchive:
-        src: https://bin.equinox.io/c/4VmDzA7iaHb/ngrok-stable-linux-amd64.zip
-        dest: /opt/tools/ngrok/stable/bin
-        remote_src: yes
-    - name: setup Ngrok profile
-      copy:
-        dest: /etc/profile.d/ngrok.sh
-        content: |
-          PATH=/opt/tools/ngrok/stable/bin:$PATH
-    - name: set final ownership to /opt/tools
-      file: 
-        path: "/opt/tools"
-        state: directory
-        owner: vagrant
-        group: vagrant
-        recurse: yes
+          - MariaDB-server
+        state: latest
+    - name: start MariaDB service
+      systemd:
+        name: mariadb
+        state: started
