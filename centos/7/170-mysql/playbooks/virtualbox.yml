@@ -130,6 +130,30 @@
           - MariaDB
           - jq
         state: latest
+    - name: create Heroku directory
+      file: 
+        path: "/opt/tools/heroku"
+        state: directory
+        owner: vagrant
+        group: vagrant
+        recurse: yes
+    - name: download Heroku
+      unarchive:
+        src: https://cli-assets.heroku.com/heroku-linux-x64.tar.gz
+        dest: /opt/tools/heroku
+        remote_src: yes
+    - name: setup Heroku profile
+      copy:
+        dest: /etc/profile.d/heroku.sh
+        content: |
+          PATH=/opt/tools/heroku/heroku/bin:$PATH
+    - name: set final ownership to /opt/tools
+      file: 
+        path: "/opt/tools"
+        state: directory
+        owner: vagrant
+        group: vagrant
+        recurse: yes
 
 - name: MariaDB installation
   hosts: mariadbs
