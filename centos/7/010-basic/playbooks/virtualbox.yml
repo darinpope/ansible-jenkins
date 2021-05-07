@@ -67,7 +67,7 @@
     - name: Install Jenkins
       yum:
         name:
-          - jenkins-2.277.3
+          - jenkins-2.277.4
         state: latest
     - name: Create directories for Jenkins
       file:
