@@ -228,7 +228,7 @@
       lineinfile:
         path: "/etc/sysconfig/jenkins"
         regexp: ".*-Djava.awt.headless=true.*"
-        line: 'JENKINS_JAVA_OPTIONS="-Djava.awt.headless=true -Djenkins.install.runSetupWizard=false -Djava.io.tmpdir=/var/cache/jenkins/tmp/ -Dorg.apache.commons.jelly.tags.fmt.timeZone=America/New_York -Duser.timezone=America/New_York"'
+        line: 'JENKINS_JAVA_OPTIONS="-Djava.awt.headless=true -Djava.net.preferIPv4Stack=true -Djenkins.install.runSetupWizard=false -Djava.io.tmpdir=/var/cache/jenkins/tmp/ -Dorg.apache.commons.jelly.tags.fmt.timeZone=America/New_York -Duser.timezone=America/New_York"'
         state: present
     - name: Update JENKINS_ARGS
       become: yes

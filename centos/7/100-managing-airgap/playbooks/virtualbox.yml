@@ -121,7 +121,7 @@
 #      lineinfile:
 #        path: "/etc/sysconfig/jenkins"
 #        regexp: ".*-Djava.awt.headless=true.*"
-#        line: 'JENKINS_JAVA_OPTIONS="-Djava.awt.headless=true -Djava.io.tmpdir=/var/cache/jenkins/tmp/"'
+#        line: 'JENKINS_JAVA_OPTIONS="-Djava.awt.headless=true -Djava.net.preferIPv4Stack=true -Djava.io.tmpdir=/var/cache/jenkins/tmp/"'
 #        state: present
 #    - name: Update JENKINS_ARGS
 #      lineinfile:
