@@ -40,6 +40,12 @@
           - git
           - wget
         state: latest
+    - name: setup java profile
+      copy:
+        dest: /etc/profile.d/java.sh
+        content: |
+          JAVA_HOME=/usr/lib/jvm/adoptopenjdk-11-hotspot
+          PATH=$JAVA_HOME/bin:$PATH
       
 - name: Jenkins installation
   hosts: jenkins_controllers
