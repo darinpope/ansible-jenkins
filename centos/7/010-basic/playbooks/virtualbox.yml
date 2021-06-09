@@ -195,14 +195,14 @@
         owner: vagrant
         group: vagrant
         recurse: yes
-    - name: download Gradle 7.0
+    - name: download Gradle 7.0.2
       unarchive:
-        src: https://services.gradle.org/distributions/gradle-7.0-bin.zip
+        src: https://services.gradle.org/distributions/gradle-7.0.2-bin.zip
         dest: /opt/tools/gradle
         remote_src: yes
     - name: create Gradle latest symlink
       file: 
-        src: /opt/tools/gradle/gradle-7.0
+        src: /opt/tools/gradle/gradle-7.0.2
         dest: /opt/tools/gradle/latest
         owner: vagrant
         group: vagrant
