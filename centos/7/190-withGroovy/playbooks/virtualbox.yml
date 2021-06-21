@@ -122,19 +122,9 @@
         owner: vagrant
         group: vagrant
         recurse: yes
-    - name: download Groovy 3.0.8
-      unarchive:
-        src: https://groovy.jfrog.io/artifactory/dist-release-local/groovy-zips/apache-groovy-binary-3.0.8.zip
-        dest: /opt/tools/groovy
-        remote_src: yes
     - name: download Groovy 2.5.14
       unarchive:
         src: https://groovy.jfrog.io/artifactory/dist-release-local/groovy-zips/apache-groovy-binary-2.5.14.zip
-        dest: /opt/tools/groovy
-        remote_src: yes
-    - name: download Groovy 2.4.21
-      unarchive:
-        src: https://groovy.jfrog.io/artifactory/dist-release-local/groovy-zips/apache-groovy-binary-2.4.21.zip
         dest: /opt/tools/groovy
         remote_src: yes
     - name: set final ownership to /opt/tools
