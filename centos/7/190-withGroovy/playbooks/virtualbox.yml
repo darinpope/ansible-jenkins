@@ -38,6 +38,7 @@
           - git
           - fontconfig
           - adoptopenjdk-11-hotspot
+          - unzip
         state: latest
       
 - name: Jenkins installation
