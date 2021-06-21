@@ -127,6 +127,18 @@
         src: https://groovy.jfrog.io/artifactory/dist-release-local/groovy-zips/apache-groovy-binary-2.5.14.zip
         dest: /opt/tools/groovy
         remote_src: yes
+    - name: create Maven directory
+      file: 
+        path: "/opt/tools/maven"
+        state: directory
+        owner: vagrant
+        group: vagrant
+        recurse: yes
+    - name: download Maven 3.6.3
+      unarchive:
+        src: https://archive.apache.org/dist/maven/maven-3/3.6.3/binaries/apache-maven-3.6.3-bin.zip
+        dest: /opt/tools/maven
+        remote_src: yes
     - name: create JDK directory
       file: 
         path: "/opt/tools/jdk"
