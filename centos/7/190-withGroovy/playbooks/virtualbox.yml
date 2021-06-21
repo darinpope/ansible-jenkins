@@ -37,7 +37,7 @@
         name:
           - git
           - fontconfig
-          - adoptopenjdk-11-hotspot
+          - adoptopenjdk-8-hotspot
           - unzip
         state: latest
       
@@ -126,6 +126,18 @@
       unarchive:
         src: https://groovy.jfrog.io/artifactory/dist-release-local/groovy-zips/apache-groovy-binary-2.5.14.zip
         dest: /opt/tools/groovy
+        remote_src: yes
+    - name: create JDK directory
+      file: 
+        path: "/opt/tools/jdk"
+        state: directory
+        owner: vagrant
+        group: vagrant
+        recurse: yes
+    - name: download AdoptOpenJDK 11.0.11
+      unarchive:
+        src: https://github.com/AdoptOpenJDK/openjdk11-binaries/releases/download/jdk-11.0.11%2B9/OpenJDK11U-jdk_x64_linux_hotspot_11.0.11_9.tar.gz
+        dest: /opt/tools/jdk
         remote_src: yes
     - name: set final ownership to /opt/tools
       file: 
