@@ -102,7 +102,7 @@
         state: started
 
 - name: Agent installation
-  hosts: agents:opensearchs
+  hosts: agents:jaegers
   become: yes
   tasks:
     - name: enable and start firewalld service

@@ -7,5 +7,5 @@ jenkins ansible_ssh_host=192.168.32.13 ansible_ssh_port=22 ansible_user=vagrant 
 [agents]
 agent1 ansible_ssh_host=192.168.32.15 ansible_ssh_port=22 ansible_user=vagrant ansible_ssh_private_key_file=.vagrant/machines/agent1/virtualbox/private_key
 
-[opensearchs]
-opensearch ansible_ssh_host=192.168.32.11 ansible_ssh_port=22 ansible_user=vagrant ansible_ssh_private_key_file=.vagrant/machines/opensearch/virtualbox/private_key
+[jaegers]
+jaeger ansible_ssh_host=192.168.32.11 ansible_ssh_port=22 ansible_user=vagrant ansible_ssh_private_key_file=.vagrant/machines/jaeger/virtualbox/private_key

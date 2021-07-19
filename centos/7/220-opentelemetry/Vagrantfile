@@ -1,10 +1,10 @@
 Vagrant.configure(2) do |config|
   config.vm.box = "bento/centos-7.9"
 
-  config.vm.define "opensearch" do |opensearch|
-    opensearch.vm.network "private_network", ip: "192.168.32.11"
-    opensearch.vm.hostname = "opensearch"
-    opensearch.vm.provider "opensearch" do |vb|
+  config.vm.define "jaeger" do |jaeger|
+    jaeger.vm.network "private_network", ip: "192.168.32.11"
+    jaeger.vm.hostname = "jaeger"
+    jaeger.vm.provider "jaeger" do |vb|
       vb.cpus = 1
       vb.memory = 1024
     end
