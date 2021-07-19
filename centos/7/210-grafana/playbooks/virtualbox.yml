@@ -102,7 +102,7 @@
         state: started
 
 - name: Agent installation
-  hosts: agents
+  hosts: agents:grafanas
   become: yes
   tasks:
     - name: enable and start firewalld service
@@ -181,6 +181,12 @@
         permanent: yes
         state: enabled
         immediate: yes
+    - name: permit traffic in default zone on port 9090/tcp
+      ansible.posix.firewalld:
+        port: 9090/tcp
+        permanent: yes
+        state: enabled
+        immediate: yes
     - name: Grafana yum repository
       yum_repository:
         name: grafana
@@ -198,3 +204,4 @@
       systemd:
         name: grafana-server
         state: started
+        enabled: yes
