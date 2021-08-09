@@ -68,12 +68,6 @@
         permanent: yes
         state: enabled
         immediate: yes
-    - name: permit traffic in default zone on port 443/tcp
-      ansible.posix.firewalld:
-        port: 443/tcp
-        permanent: yes
-        state: enabled
-        immediate: yes
     - name: jenkins yum repository
       yum_repository:
         name: jenkins
