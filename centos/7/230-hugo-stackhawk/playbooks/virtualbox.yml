@@ -193,3 +193,10 @@
         owner: vagrant
         group: vagrant
         recurse: yes
+    - name: change permissions on Apache default directory
+      file: 
+        path: "/var/www"
+        state: directory
+        owner: vagrant
+        group: vagrant
+        recurse: yes
