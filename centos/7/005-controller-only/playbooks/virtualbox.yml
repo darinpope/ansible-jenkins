@@ -39,6 +39,7 @@
           - adoptopenjdk-11-hotspot
           - git
           - wget
+          - epel-release
         state: latest
     - name: setup java profile
       copy:
