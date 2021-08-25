@@ -58,7 +58,7 @@
     - name: Install Jenkins
       apt:
         name:
-          - jenkins-2.289.3
+          - jenkins-2.303.1
         state: latest
     - name: Stop Jenkins (autostarts after install)
       systemd:
