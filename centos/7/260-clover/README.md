@@ -1,7 +1,5 @@
 # basic
 
--Dhudson.model.DirectoryBrowserSupport.CSP=\"sandbox; default-src 'self'; img-src 'self'; style-src 'self';\"
-
 ## Prerequisites
 
 * `ansible-galaxy collection install -r requirements.yml`
