@@ -20,12 +20,25 @@
         enabled: yes
         gpgcheck: yes
         gpgkey: https://adoptopenjdk.jfrog.io/adoptopenjdk/api/gpg/key/public
-    - name: Install fontconfig, AdoptOpenJDK and git
+    - name: Endpoint yum repository
+      yum_repository:
+        name: endpoint
+        description: End Point repository
+        baseurl: https://packages.endpoint.com/rhel/$releasever/os/$basearch/
+        enabled: yes
+        gpgcheck: yes
+        gpgkey: https://packages.endpoint.com/endpoint-rpmsign-7.pub
+    - name: remove any installed git
+      yum:
+        name: git
+        state: absent
+    - name: Install git
       yum:
         name:
+          - git
+          - unzip
           - fontconfig
           - adoptopenjdk-11-hotspot
-          - git
         state: latest
       
 - name: Jenkins installation
@@ -51,9 +64,10 @@
         enabled: yes
         gpgcheck: yes
         gpgkey: https://pkg.jenkins.io/redhat-stable/jenkins.io.key
-    - name: Install Jenkins
+    - name: Install JDK and Jenkins
       yum:
         name:
+          - epel-release
           - jenkins-2.303.2
         state: latest
     - name: Create directories for Jenkins
@@ -87,8 +101,8 @@
         name: jenkins
         state: started
 
-- name: Agent installation
-  hosts: agents
+- name: Tunnel installation
+  hosts: tunnels
   become: yes
   tasks:
     - name: enable and start firewalld service
@@ -102,99 +116,27 @@
         permanent: yes
         state: enabled
         immediate: yes
-    - name: remove any installed docker
-      dnf:
-        name:
-          - docker
-          - docker-client
-          - docker-client-latest
-          - docker-common
-          - docker-latest
-          - docker-latest-logrotate
-          - docker-logrotate
-          - docker-engine
-        state: absent
-    - name: docker-ce-stable repository
-      yum_repository:
-        name: docker-ce-stable
-        description: Docker CE Stable - $basearch
-        baseurl: https://download.docker.com/linux/centos/8/$basearch/stable
-        enabled: yes
-        gpgcheck: yes
-        gpgkey: https://download.docker.com/linux/centos/gpg
-    - name: Install Docker and unzip
-      dnf:
-        name: 
-          - docker-ce
-          - unzip
-        state: latest
-    - name: add docker group
-      group:
-        name: docker
-        state: present
-    - name: add $USER to docker group
-      user: 
-        name: "{{ ansible_user }}"
-        groups: docker
-        append: yes
-    - name: do a ssh reset in order to reflect the $USER group changes
-      meta: reset_connection
-    - name: start Docker service
-      systemd:
-        name: docker
-        state: started        
-    - name: create Maven directory
+    - name: create Ngrok directory
       file: 
-        path: "/opt/tools/maven"
+        path: "/opt/tools/ngrok/stable/bin"
         state: directory
         owner: vagrant
         group: vagrant
         recurse: yes
-    - name: download Maven 3.8.2
+    - name: download Ngrok stable
       unarchive:
-        src: https://mirrors.sonic.net/apache/maven/maven-3/3.8.2/binaries/apache-maven-3.8.2-bin.tar.gz
-        dest: /opt/tools/maven
+        src: https://bin.equinox.io/c/4VmDzA7iaHb/ngrok-stable-linux-amd64.zip
+        dest: /opt/tools/ngrok/stable/bin
         remote_src: yes
-    - name: create Maven latest symlink
-      file: 
-        src: /opt/tools/maven/apache-maven-3.8.2
-        dest: /opt/tools/maven/latest
-        owner: vagrant
-        group: vagrant
-        state: link
-    - name: setup Maven profile
+    - name: setup Ngrok profile
       copy:
-        dest: /etc/profile.d/maven.sh
+        dest: /etc/profile.d/ngrok.sh
         content: |
-          PATH=/opt/tools/maven/latest/bin:$PATH
-    - name: create Gradle directory
-      file: 
-        path: "/opt/tools/gradle"
-        state: directory
-        owner: vagrant
-        group: vagrant
-        recurse: yes
-    - name: download Gradle 7.2
-      unarchive:
-        src: https://services.gradle.org/distributions/gradle-7.2-bin.zip
-        dest: /opt/tools/gradle
-        remote_src: yes
-    - name: create Gradle latest symlink
-      file: 
-        src: /opt/tools/gradle/gradle-7.2
-        dest: /opt/tools/gradle/latest
-        owner: vagrant
-        group: vagrant
-        state: link
-    - name: setup Gradle profile
-      copy:
-        dest: /etc/profile.d/gradle.sh
-        content: |
-          PATH=/opt/tools/gradle/latest/bin:$PATH
+          PATH=/opt/tools/ngrok/stable/bin:$PATH
     - name: set final ownership to /opt/tools
       file: 
         path: "/opt/tools"
         state: directory
         owner: vagrant
         group: vagrant
-        recurse: yes
+        recurse: yes    
