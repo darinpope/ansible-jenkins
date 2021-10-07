@@ -117,7 +117,7 @@ jenkins hard nproc 30654
 * install Maven
   * `mkdir -p /opt/tools/maven`
   * `cd /opt/tools/maven`
-  * `wget https://mirrors.sonic.net/apache/maven/maven-3/3.8.2/binaries/apache-maven-3.8.3-bin.tar.gz`
+  * `wget https://mirrors.sonic.net/apache/maven/maven-3/3.8.3/binaries/apache-maven-3.8.3-bin.tar.gz`
   * `tar zxvf apache-maven-3.8.3-bin.tar.gz`
   * `rm -f apache-maven-3.8.3-bin.tar.gz`
   * `ln -s apache-maven-3.8.3 latest`

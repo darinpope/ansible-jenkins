@@ -129,9 +129,9 @@
         owner: vagrant
         group: vagrant
         recurse: yes
-    - name: download Maven 3.8.2
+    - name: download Maven 3.8.3
       unarchive:
-        src: https://mirrors.sonic.net/apache/maven/maven-3/3.8.2/binaries/apache-maven-3.8.3-bin.tar.gz
+        src: https://mirrors.sonic.net/apache/maven/maven-3/3.8.3/binaries/apache-maven-3.8.3-bin.tar.gz
         dest: /opt/tools/maven
         remote_src: yes
     - name: create Maven latest symlink
