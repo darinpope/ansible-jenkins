@@ -38,6 +38,7 @@
           - git
           - unzip
           - fontconfig
+          - epel-release
           - adoptopenjdk-11-hotspot
         state: latest
       
@@ -67,7 +68,6 @@
     - name: Install JDK and Jenkins
       yum:
         name:
-          - epel-release
           - jenkins-2.303.2
         state: latest
     - name: Create directories for Jenkins
