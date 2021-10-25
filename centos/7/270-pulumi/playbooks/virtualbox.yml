@@ -181,7 +181,7 @@
       copy:
         dest: /etc/profile.d/pulumi.sh
         content: |
-          PATH=/opt/tools/pulumi:$PATH
+          PATH=/opt/tools/pulumi/pulumi:$PATH
     - name: set final ownership to /opt/tools
       file: 
         path: "/opt/tools"
