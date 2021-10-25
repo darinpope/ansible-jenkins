@@ -149,6 +149,11 @@
           - docker-ce-cli
           - containerd.io
           - unzip
+          - wget
+          - make
+          - gcc
+          - openssl-devel
+          - bzip2-devel
         state: latest
     - name: add docker group
       group:
@@ -182,6 +187,44 @@
         dest: /etc/profile.d/pulumi.sh
         content: |
           PATH=/opt/tools/pulumi/pulumi:$PATH
+    - name: download Python
+      unarchive:
+        src: https://www.python.org/ftp/python/3.9.7/Python-3.9.7.tgz
+        dest: /tmp
+        remote_src: yes
+    - name: configure Python
+      ansible.builtin.shell:
+        cmd: ./configure --enable-optimizations
+        chdir: /tmp/Python-3.9.7
+    - name: install Python
+      ansible.builtin.shell:
+        cmd: make altinstall
+        chdir: /tmp/Python-3.9.7
+    - name: Create a symbolic link for python3.9
+      ansible.builtin.file:
+        src: /usr/local/bin/python3.9
+        dest: /usr/bin/python3.9
+        state: link
+    - name: Create a symbolic link for python3
+      ansible.builtin.file:
+        src: /usr/local/bin/python3.9
+        dest: /usr/bin/python3
+        state: link
+    - name: Override default python symlink
+      ansible.builtin.file:
+        src: /usr/local/bin/python3.9
+        dest: /usr/bin/python
+        state: link
+    - name: Create a symbolic link for pip
+      ansible.builtin.file:
+        src: /usr/local/bin/pip3.9
+        dest: /usr/bin/pip3
+        state: link
+    - name: Override default link for pip
+      ansible.builtin.file:
+        src: /usr/local/bin/pip3.9
+        dest: /usr/bin/pip
+        state: link
     - name: set final ownership to /opt/tools
       file: 
         path: "/opt/tools"
