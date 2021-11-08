@@ -188,7 +188,7 @@
       become: yes
       yum:
         name:
-          - jenkins-2.303.2
+          - jenkins-2.303.3
         state: latest
     - name: Create directories for Jenkins
       become: yes
