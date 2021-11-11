@@ -17,6 +17,25 @@
   hosts: jenkins_controllers
   become: yes
   tasks:
+    - name: Endpoint yum repository
+      yum_repository:
+        name: endpoint
+        description: End Point repository
+        baseurl: https://packages.endpoint.com/rhel/$releasever/os/$basearch/
+        enabled: yes
+        gpgcheck: yes
+        gpgkey: https://packages.endpoint.com/endpoint-rpmsign-7.pub
+    - name: remove any installed git
+      yum:
+        name: git
+        state: absent
+    - name: Install fontconfig, AdoptOpenJDK and git
+      yum:
+        name:
+          - git
+          - wget
+          - epel-release
+        state: latest
     - name: enable and start firewalld service
       systemd:
         name: firewalld
