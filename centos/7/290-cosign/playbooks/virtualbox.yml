@@ -149,7 +149,6 @@
           - docker-ce-cli
           - containerd.io
           - unzip
-          - jq
         state: latest
     - name: add docker group
       group:
@@ -166,40 +165,33 @@
       systemd:
         name: docker
         state: started        
-    - name: create Syft directory
+    - name: create cosign directory
       file: 
-        path: "/opt/tools/syft"
+        path: "/opt/tools/cosign"
         state: directory
         owner: vagrant
         group: vagrant
         recurse: yes
-    - name: download Syft 0.21.0
-      unarchive:
-        src: https://github.com/anchore/syft/releases/download/v0.21.0/syft_0.21.0_linux_amd64.tar.gz
-        dest: /opt/tools/syft
-        remote_src: yes
-    - name: setup Syft profile
+    - name: download cosign 1.4.0
+      get_url:
+        url: https://github.com/sigstore/cosign/releases/download/v1.4.0/cosign-linux-amd64
+        dest: /opt/tools/cosign/cosign
+        mode: '0755'
+    - name: download cosigned 1.4.0
+      get_url:
+        url: https://github.com/sigstore/cosign/releases/download/v1.4.0/cosigned-linux-amd64
+        dest: /opt/tools/cosign/cosigned
+        mode: '0755'
+    - name: download sget 1.4.0
+      get_url:
+        url: https://github.com/sigstore/cosign/releases/download/v1.4.0/sget-linux-amd64
+        dest: /opt/tools/cosign/sget
+        mode: '0755'
+    - name: setup cosign profile
       copy:
-        dest: /etc/profile.d/syft.sh
+        dest: /etc/profile.d/cosign.sh
         content: |
-          PATH=/opt/tools/syft:$PATH
-    - name: create Grype directory
-      file: 
-        path: "/opt/tools/grype"
-        state: directory
-        owner: vagrant
-        group: vagrant
-        recurse: yes
-    - name: download Grype 0.17.0
-      unarchive:
-        src: https://github.com/anchore/grype/releases/download/v0.17.0/grype_0.17.0_linux_amd64.tar.gz
-        dest: /opt/tools/grype
-        remote_src: yes
-    - name: setup Grype profile
-      copy:
-        dest: /etc/profile.d/grype.sh
-        content: |
-          PATH=/opt/tools/grype:$PATH
+          PATH=/opt/tools/cosign:$PATH
     - name: set final ownership to /opt/tools
       file: 
         path: "/opt/tools"

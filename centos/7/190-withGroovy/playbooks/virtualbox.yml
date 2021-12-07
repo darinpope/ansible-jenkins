@@ -67,7 +67,7 @@
     - name: Install JDK and Jenkins
       yum:
         name:
-          - jenkins-2.303.3
+          - jenkins-2.319.1
         state: latest
     - name: Create directories for Jenkins
       file:
