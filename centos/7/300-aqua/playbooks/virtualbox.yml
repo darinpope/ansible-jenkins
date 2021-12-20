@@ -181,7 +181,7 @@
       copy:
         dest: /etc/profile.d/aqua.sh
         content: |
-          PATH=/opt/tools/aqua:$PATH
+          PATH=/opt/tools/aqua:$HOME/.aqua/bin:$PATH
     - name: set final ownership to /opt/tools
       file: 
         path: "/opt/tools"
