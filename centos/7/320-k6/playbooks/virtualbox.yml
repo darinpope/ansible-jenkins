@@ -1,0 +1,191 @@
+---
+- name: Install base software on all
+  hosts: all
+  gather_facts: yes
+  become: yes
+  tasks:
+    - name: update hosts
+      lineinfile:
+        path: "/etc/hosts"
+        regexp: ".*\t{{ hostvars[item]['ansible_hostname']}}\t{{ hostvars[item]['ansible_hostname']}}"
+        line: "{{ hostvars[item]['ansible_ssh_host'] }}\t{{ hostvars[item]['ansible_hostname']}}\t{{ hostvars[item]['ansible_hostname']}}"
+        state: present
+        backup: yes
+      with_items: "{{ ansible_play_batch }}"       
+    - name: AdoptOpenJDK yum repository
+      yum_repository:
+        name: AdoptOpenJDK
+        description: AdoptOpenJDK
+        baseurl: http://adoptopenjdk.jfrog.io/adoptopenjdk/rpm/centos/$releasever/$basearch
+        enabled: yes
+        gpgcheck: yes
+        gpgkey: https://adoptopenjdk.jfrog.io/adoptopenjdk/api/gpg/key/public
+    - name: Endpoint yum repository
+      yum_repository:
+        name: endpoint
+        description: End Point repository
+        baseurl: https://packages.endpoint.com/rhel/$releasever/os/$basearch/
+        enabled: yes
+        gpgcheck: yes
+        gpgkey: https://packages.endpoint.com/endpoint-rpmsign-7.pub
+    - name: remove any installed git
+      yum:
+        name: git
+        state: absent
+    - name: Install fontconfig, AdoptOpenJDK and git
+      yum:
+        name:
+          - fontconfig
+          - adoptopenjdk-11-hotspot
+          - git
+          - wget
+          - epel-release
+        state: latest
+    - name: setup java profile
+      copy:
+        dest: /etc/profile.d/java.sh
+        content: |
+          JAVA_HOME=/usr/lib/jvm/adoptopenjdk-11-hotspot
+          PATH=$JAVA_HOME/bin:$PATH
+      
+- name: Jenkins installation
+  hosts: jenkins_controllers
+  become: yes
+  tasks:
+    - name: enable and start firewalld service
+      systemd:
+        name: firewalld
+        state: started
+        enabled: yes
+    - name: permit traffic in default zone on port 8080/tcp
+      ansible.posix.firewalld:
+        port: 8080/tcp
+        permanent: yes
+        state: enabled
+        immediate: yes
+    - name: jenkins yum repository
+      yum_repository:
+        name: jenkins
+        description: Jenkins-stable
+        baseurl: http://pkg.jenkins.io/redhat-stable
+        enabled: yes
+        gpgcheck: yes
+        gpgkey: https://pkg.jenkins.io/redhat-stable/jenkins.io.key
+    - name: Install Jenkins
+      yum:
+        name:
+          - jenkins-2.319.1
+        state: latest
+    - name: Create directories for Jenkins
+      file:
+        path: "{{ item }}"
+        state: directory
+        owner: jenkins
+        group: jenkins
+        recurse: yes
+      with_items:
+        - '/var/cache/jenkins/tmp'
+        - '/var/cache/jenkins/heapdumps'
+    - name: Update JENKINS_JAVA_OPTIONS
+      lineinfile:
+        path: "/etc/sysconfig/jenkins"
+        regexp: ".*-Djava.awt.headless=true.*"
+        line: 'JENKINS_JAVA_OPTIONS="-Djava.awt.headless=true -Djava.net.preferIPv4Stack=true -Djava.io.tmpdir=/var/cache/jenkins/tmp/ -Dorg.apache.commons.jelly.tags.fmt.timeZone=America/New_York -Duser.timezone=America/New_York"'
+        state: present
+    - name: Update JENKINS_ARGS
+      lineinfile:
+        path: "/etc/sysconfig/jenkins"
+        regexp: ".*JENKINS_ARGS=.*"
+        line: 'JENKINS_ARGS="--pluginroot=/var/cache/jenkins/plugins"'
+        state: present
+    - name: Create limits file
+      copy:
+        dest: "/etc/security/limits.d/30-jenkins.conf"
+        src: "30-jenkins.conf"
+    - name: start jenkins service
+      systemd:
+        name: jenkins
+        state: started
+
+- name: Agent installation
+  hosts: agents
+  become: yes
+  tasks:
+    - name: enable and start firewalld service
+      systemd:
+        name: firewalld
+        state: started
+        enabled: yes
+    - name: permit traffic in default zone on port 22/tcp
+      ansible.posix.firewalld:
+        port: 22/tcp
+        permanent: yes
+        state: enabled
+        immediate: yes
+    - name: remove any installed docker
+      yum:
+        name:
+          - docker
+          - docker-client
+          - docker-client-latest
+          - docker-common
+          - docker-latest
+          - docker-latest-logrotate
+          - docker-logrotate
+          - docker-engine
+        state: absent
+    - name: docker-ce-stable yum repository
+      yum_repository:
+        name: docker-ce-stable
+        description: Docker CE Stable - $basearch
+        baseurl: https://download.docker.com/linux/centos/7/$basearch/stable
+        enabled: yes
+        gpgcheck: yes
+        gpgkey: https://download.docker.com/linux/centos/gpg
+    - name: Install Docker and unzip
+      yum:
+        name: 
+          - docker-ce
+          - docker-ce-cli
+          - containerd.io
+          - unzip
+        state: latest
+    - name: add docker group
+      group:
+        name: docker
+        state: present
+    - name: add $USER to docker group
+      user: 
+        name: "{{ ansible_user }}"
+        groups: docker
+        append: yes
+    - name: do a ssh reset in order to reflect the $USER group changes
+      meta: reset_connection
+    - name: start Docker service
+      systemd:
+        name: docker
+        state: started        
+    - name: create k6 directory
+      file: 
+        path: "/opt/tools/k6"
+        state: directory
+        owner: vagrant
+        group: vagrant
+        recurse: yes
+    - name: download k6 0.35.0
+      unarchive:
+        src: https://github.com/grafana/k6/releases/download/v0.35.0/k6-v0.35.0-linux-amd64.tar.gz
+        dest: /opt/tools/k6
+        remote_src: yes
+    - name: setup Maven profile
+      copy:
+        dest: /etc/profile.d/k6.sh
+        content: |
+          PATH=/opt/tools/k6/k6-v0.35.0-linux-amd64:$PATH
+    - name: set final ownership to /opt/tools
+      file: 
+        path: "/opt/tools"
+        state: directory
+        owner: vagrant
+        group: vagrant
+        recurse: yes
