@@ -37,7 +37,7 @@
         name:
           - git
           - fontconfig
-          - adoptopenjdk-8-hotspot
+          - adoptopenjdk-11-hotspot
           - unzip
           - epel-release
         state: latest
