@@ -137,7 +137,7 @@
         recurse: yes
     - name: download NodeJS 16.13.2
       unarchive:
-        src: https://nodejs.org/dist/v16.13.2/node-v16.13.2-linux-x64.tar.xz
+        src: https://nodejs.org/dist/v16.13.2/node-v16.13.2-linux-x64.tar.gz
         dest: /opt/tools/nodejs/16.13.2
         remote_src: yes
     - name: set final ownership to /opt/tools
