@@ -128,6 +128,18 @@
         src: https://go.dev/dl/go1.16.13.linux-amd64.tar.gz
         dest: /opt/tools/go/1.16.13
         remote_src: yes
+    - name: create NodeJS directory
+      file: 
+        path: "/opt/tools/nodejs/16.13.2"
+        state: directory
+        owner: vagrant
+        group: vagrant
+        recurse: yes
+    - name: download NodeJS 16.13.2
+      unarchive:
+        src: https://nodejs.org/dist/v16.13.2/node-v16.13.2-linux-x64.tar.xz
+        dest: /opt/tools/nodejs/16.13.2
+        remote_src: yes
     - name: set final ownership to /opt/tools
       file: 
         path: "/opt/tools"
