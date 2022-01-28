@@ -24,10 +24,10 @@
       yum_repository:
         name: endpoint
         description: End Point repository
-        baseurl: https://packages.endpoint.com/rhel/$releasever/os/$basearch/
+        baseurl: https://packages.endpointdev.com/rhel/$releasever/os/$basearch/
         enabled: yes
         gpgcheck: yes
-        gpgkey: https://packages.endpoint.com/endpoint-rpmsign-7.pub
+        gpgkey: https://packages.endpointdev.com/endpoint-rpmsign-7.pub
     - name: Google Chrome yum repository
       yum_repository:
         name: google-chrome

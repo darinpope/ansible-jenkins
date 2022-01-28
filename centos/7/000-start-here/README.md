@@ -62,7 +62,7 @@ EOF
 ```
 
 * repo to get latest version Git
-  * `yum -y install https://packages.endpoint.com/rhel/7/os/x86_64/endpoint-repo-1.7-1.x86_64.rpm`
+  * `yum -y install https://packages.endpointdev.com/rhel/7/os/x86_64/endpoint-repo-1.7-1.x86_64.rpm`
 
 * Jenkins repo
   * `wget -O /etc/yum.repos.d/jenkins.repo https://pkg.jenkins.io/redhat-stable/jenkins.repo`
@@ -122,7 +122,7 @@ EOF
 ```
 
 * repo to get latest version Git
-  * `yum -y install https://packages.endpoint.com/rhel/7/os/x86_64/endpoint-repo-1.7-1.x86_64.rpm`
+  * `yum -y install https://packages.endpointdev.com/rhel/7/os/x86_64/endpoint-repo-1.7-1.x86_64.rpm`
 
 * `yum remove git*`
 * `yum -y install adoptopenjdk-11-hotspot git fontconfig wget`
