@@ -149,6 +149,7 @@
           - docker-ce-cli
           - containerd.io
           - unzip
+          - jq
         state: latest
     - name: add docker group
       group:
