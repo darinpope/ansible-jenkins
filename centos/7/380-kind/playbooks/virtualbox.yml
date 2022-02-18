@@ -191,3 +191,16 @@
       copy:
         dest: "/home/vagrant/kind-config.yaml"
         src: "kind-config.yaml"    
+
+
+- name: Kind configuration
+  hosts: agents
+  tasks:
+    - name: create cluster
+      command: kind create cluster --config /home/vagrant/kind-config.yaml
+    - name: create namespace
+      command: kubectl create namespace jenkins
+    - name: create serviceaccount
+      command: kubectl create serviceaccount jenkins --namespace=jenkins
+    - name: create rolebinding
+      command: kubectl create rolebinding jenkins-admin-binding --clusterrole=admin --serviceaccount=jenkins:jenkins --namespace=jenkins
