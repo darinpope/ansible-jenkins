@@ -120,7 +120,7 @@
       yum_repository:
         name: MariaDB
         description: MariaDB
-        baseurl: http://yum.mariadb.org/10.7/centos$releasever-amd64
+        baseurl: http://yum.mariadb.org/10.6/centos$releasever-amd64
         enabled: yes
         gpgcheck: yes
         gpgkey: https://yum.mariadb.org/RPM-GPG-KEY-MariaDB
@@ -223,7 +223,7 @@
       yum_repository:
         name: MariaDB
         description: MariaDB
-        baseurl: http://yum.mariadb.org/10.7/centos$releasever-amd64
+        baseurl: http://yum.mariadb.org/10.6/centos$releasever-amd64
         enabled: yes
         gpgcheck: yes
         gpgkey: https://yum.mariadb.org/RPM-GPG-KEY-MariaDB
