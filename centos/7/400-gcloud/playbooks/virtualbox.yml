@@ -12,14 +12,14 @@
         state: present
         backup: yes
       with_items: "{{ ansible_play_batch }}"       
-    - name: AdoptOpenJDK yum repository
+    - name: Adoptium yum repository
       yum_repository:
-        name: AdoptOpenJDK
-        description: AdoptOpenJDK
-        baseurl: http://adoptopenjdk.jfrog.io/adoptopenjdk/rpm/centos/$releasever/$basearch
+        name: Adoptium
+        description: Adoptium
+        baseurl: https://packages.adoptium.net/artifactory/rpm/centos/$releasever/$basearch
         enabled: yes
         gpgcheck: yes
-        gpgkey: https://adoptopenjdk.jfrog.io/adoptopenjdk/api/gpg/key/public
+        gpgkey: https://packages.adoptium.net/artifactory/api/gpg/key/public
     - name: Endpoint yum repository
       yum_repository:
         name: endpoint
@@ -35,18 +35,11 @@
     - name: Install fontconfig, AdoptOpenJDK and git
       yum:
         name:
-          - fontconfig
-          - adoptopenjdk-11-hotspot
+          - temurin-11-jdk
           - git
           - wget
           - epel-release
         state: latest
-    - name: setup java profile
-      copy:
-        dest: /etc/profile.d/java.sh
-        content: |
-          JAVA_HOME=/usr/lib/jvm/adoptopenjdk-11-hotspot
-          PATH=$JAVA_HOME/bin:$PATH
       
 - name: Jenkins installation
   hosts: jenkins_controllers
@@ -105,7 +98,7 @@
     - name: start jenkins service
       systemd:
         name: jenkins
-        state: started
+        state: restarted
 
 - name: Agent installation
   hosts: agents
