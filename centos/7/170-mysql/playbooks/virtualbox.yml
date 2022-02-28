@@ -234,4 +234,4 @@
     - name: start MariaDB service
       systemd:
         name: mariadb
-        state: started
+        state: restarted
