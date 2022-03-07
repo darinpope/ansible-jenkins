@@ -102,7 +102,7 @@
   tasks:
     - name: Update repositories and install tar package
       community.general.apk:
-        name: tar,openjdk11,docker
+        name: tar,openjdk11,docker,git
         update_cache: yes
         state: present
     - name: add docker group
