@@ -102,9 +102,24 @@
   tasks:
     - name: Update repositories and install tar package
       community.general.apk:
-        name: tar,openjdk11
+        name: tar,openjdk11,docker
         update_cache: yes
         state: present
+    - name: add docker group
+      group:
+        name: docker
+        state: present
+    - name: add $USER to docker group
+      user: 
+        name: "{{ ansible_user }}"
+        groups: docker
+        append: yes
+    - name: do a ssh reset in order to reflect the $USER group changes
+      meta: reset_connection
+    - name: start Docker service
+      ansible.builtin.service:
+        name: docker
+        state: restarted       
     - name: create apko directory
       file: 
         path: "/opt/tools/apko"

@@ -7,6 +7,8 @@
 ## Startup
 
 * `vagrant up`
+* `vagrant ssh agent1`
+  * `sudo apk install python3`
 * `ansible-playbook -i inventory/virtualbox.hosts playbooks/virtualbox.yml`
 
 ## Setup Jenkins UI
