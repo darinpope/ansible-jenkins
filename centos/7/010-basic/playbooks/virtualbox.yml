@@ -12,14 +12,14 @@
         state: present
         backup: yes
       with_items: "{{ ansible_play_batch }}"       
-    - name: AdoptOpenJDK yum repository
+    - name: Adoptium yum repository
       yum_repository:
-        name: AdoptOpenJDK
-        description: AdoptOpenJDK
-        baseurl: http://adoptopenjdk.jfrog.io/adoptopenjdk/rpm/centos/$releasever/$basearch
+        name: Adoptium
+        description: Adoptium
+        baseurl: https://packages.adoptium.net/artifactory/rpm/centos/$releasever/$basearch
         enabled: yes
         gpgcheck: yes
-        gpgkey: https://adoptopenjdk.jfrog.io/adoptopenjdk/api/gpg/key/public
+        gpgkey: https://packages.adoptium.net/artifactory/api/gpg/key/public
     - name: Endpoint yum repository
       yum_repository:
         name: endpoint
@@ -32,21 +32,14 @@
       yum:
         name: git
         state: absent
-    - name: Install fontconfig, AdoptOpenJDK and git
+    - name: Install temurin and git
       yum:
         name:
-          - fontconfig
-          - adoptopenjdk-11-hotspot
+          - temurin-11-jdk
           - git
           - wget
           - epel-release
         state: latest
-    - name: setup java profile
-      copy:
-        dest: /etc/profile.d/java.sh
-        content: |
-          JAVA_HOME=/usr/lib/jvm/adoptopenjdk-11-hotspot
-          PATH=$JAVA_HOME/bin:$PATH
       
 - name: Jenkins installation
   hosts: jenkins_controllers
@@ -74,7 +67,7 @@
     - name: Install Jenkins
       yum:
         name:
-          - jenkins-2.319.3
+          - jenkins-2.332.1
         state: latest
     - name: Create directories for Jenkins
       file:
@@ -86,26 +79,23 @@
       with_items:
         - '/var/cache/jenkins/tmp'
         - '/var/cache/jenkins/heapdumps'
-    - name: Update JENKINS_JAVA_OPTIONS
-      lineinfile:
-        path: "/etc/sysconfig/jenkins"
-        regexp: ".*-Djava.awt.headless=true.*"
-        line: 'JENKINS_JAVA_OPTIONS="-Djava.awt.headless=true -Djava.net.preferIPv4Stack=true -Djava.io.tmpdir=/var/cache/jenkins/tmp/ -Dorg.apache.commons.jelly.tags.fmt.timeZone=America/New_York -Duser.timezone=America/New_York"'
-        state: present
-    - name: Update JENKINS_ARGS
-      lineinfile:
-        path: "/etc/sysconfig/jenkins"
-        regexp: ".*JENKINS_ARGS=.*"
-        line: 'JENKINS_ARGS="--pluginroot=/var/cache/jenkins/plugins"'
-        state: present
+    - name: Create directory for systemd override file
+      file:
+        path: "{{ item }}"
+        state: directory
+        owner: root
+        group: root
+        recurse: yes
+      with_items:
+        - '/etc/systemd/system/jenkins.service.d'
     - name: Create limits file
       copy:
-        dest: "/etc/security/limits.d/30-jenkins.conf"
-        src: "30-jenkins.conf"
+        dest: "/etc/systemd/system/jenkins.service.d/override.conf"
+        src: "override.conf"
     - name: start jenkins service
       systemd:
         name: jenkins
-        state: started
+        state: restarted
 
 - name: Agent installation
   hosts: agents
@@ -164,7 +154,7 @@
     - name: start Docker service
       systemd:
         name: docker
-        state: started        
+        state: restarted        
     - name: create Maven directory
       file: 
         path: "/opt/tools/maven"
