@@ -40,7 +40,7 @@
       yum:
         name: git
         state: absent
-    - name: Install fontconfig, Temurin and git
+    - name: Install Temurin and git
       yum:
         name:
           - temurin-11-jdk
@@ -48,12 +48,6 @@
           - wget
           - epel-release
         state: latest
-    - name: setup java profile
-      copy:
-        dest: /etc/profile.d/java.sh
-        content: |
-          JAVA_HOME=/usr/lib/jvm/adoptopenjdk-11-hotspot
-          PATH=$JAVA_HOME/bin:$PATH
       
 - name: Jenkins Old installation
   hosts: jenkins_old_controllers
@@ -79,8 +73,7 @@
     - name: Install Jenkins
       yum:
         name:
-          - jenkins-2.303.3
-        state: latest
+          - jenkins-2.319.3
     - name: Create directories for Jenkins
       file:
         path: "{{ item }}"
@@ -91,22 +84,19 @@
       with_items:
         - '/var/cache/jenkins/tmp'
         - '/var/cache/jenkins/heapdumps'
-    - name: Update JENKINS_JAVA_OPTIONS
-      lineinfile:
-        path: "/etc/sysconfig/jenkins"
-        regexp: ".*-Djava.awt.headless=true.*"
-        line: 'JENKINS_JAVA_OPTIONS="-Djava.awt.headless=true -Djava.net.preferIPv4Stack=true -Djava.io.tmpdir=/var/cache/jenkins/tmp/ -Dorg.apache.commons.jelly.tags.fmt.timeZone=America/New_York -Duser.timezone=America/New_York"'
-        state: present
-    - name: Update JENKINS_ARGS
-      lineinfile:
-        path: "/etc/sysconfig/jenkins"
-        regexp: ".*JENKINS_ARGS=.*"
-        line: 'JENKINS_ARGS="--pluginroot=/var/cache/jenkins/plugins"'
-        state: present
+    - name: Create directory for systemd override file
+      file:
+        path: "{{ item }}"
+        state: directory
+        owner: root
+        group: root
+        recurse: yes
+      with_items:
+        - '/etc/systemd/system/jenkins.service.d'
     - name: Create limits file
       copy:
-        dest: "/etc/security/limits.d/30-jenkins.conf"
-        src: "30-jenkins.conf"
+        dest: "/etc/systemd/system/jenkins.service.d/override.conf"
+        src: "override.conf"
     - name: start jenkins service
       systemd:
         name: jenkins
@@ -137,8 +127,7 @@
     - name: Install Jenkins
       yum:
         name:
-          - jenkins-2.319.3
-        state: latest
+          - jenkins-2.332.1
     - name: Create directories for Jenkins
       file:
         path: "{{ item }}"
@@ -149,22 +138,19 @@
       with_items:
         - '/var/cache/jenkins/tmp'
         - '/var/cache/jenkins/heapdumps'
-    - name: Update JENKINS_JAVA_OPTIONS
-      lineinfile:
-        path: "/etc/sysconfig/jenkins"
-        regexp: ".*-Djava.awt.headless=true.*"
-        line: 'JENKINS_JAVA_OPTIONS="-Djava.awt.headless=true -Djava.net.preferIPv4Stack=true -Djava.io.tmpdir=/var/cache/jenkins/tmp/ -Dorg.apache.commons.jelly.tags.fmt.timeZone=America/New_York -Duser.timezone=America/New_York"'
-        state: present
-    - name: Update JENKINS_ARGS
-      lineinfile:
-        path: "/etc/sysconfig/jenkins"
-        regexp: ".*JENKINS_ARGS=.*"
-        line: 'JENKINS_ARGS="--pluginroot=/var/cache/jenkins/plugins"'
-        state: present
+    - name: Create directory for systemd override file
+      file:
+        path: "{{ item }}"
+        state: directory
+        owner: root
+        group: root
+        recurse: yes
+      with_items:
+        - '/etc/systemd/system/jenkins.service.d'
     - name: Create limits file
       copy:
-        dest: "/etc/security/limits.d/30-jenkins.conf"
-        src: "30-jenkins.conf"
+        dest: "/etc/systemd/system/jenkins.service.d/override.conf"
+        src: "override.conf"
     - name: start jenkins service
       systemd:
         name: jenkins
