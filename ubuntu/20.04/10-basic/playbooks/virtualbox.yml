@@ -12,21 +12,21 @@
         state: present
         backup: yes
       with_items: "{{ ansible_play_batch }}"       
-    - name: add AdoptOpenJDK apt key
-      apt_key:
-        url: https://adoptopenjdk.jfrog.io/adoptopenjdk/api/gpg/key/public
+    - name: add Adoptium apt key
+      ansible.builtin.apt_key:
+        url: https://packages.adoptium.net/artifactory/api/gpg/key/public
         state: present
-    - name: add AdoptOpenJDK repository
-      apt_repository:
-        repo: deb https://adoptopenjdk.jfrog.io/adoptopenjdk/deb focal main
+    - name: add Adoptium repository
+      ansible.builtin.apt_repository:
+        repo: deb https://packages.adoptium.net/artifactory/deb focal main
+        state: present
     - name: Install common software
       apt:
         name:
-          - adoptopenjdk-11-hotspot
+          - temurin-11-jdk
           - apt-transport-https 
           - ca-certificates 
           - curl 
-          - fontconfig
           - git
           - gnupg
           - gnupg-agent 
@@ -49,17 +49,17 @@
         port: '8080'
         proto: tcp
     - name: add Jenkins apt key
-      apt_key:
-        url: https://pkg.jenkins.io/debian/jenkins.io.key
+      ansible.builtin.apt_key:
+        url: https://pkg.jenkins.io/debian-stable/jenkins.io.key
         state: present
     - name: Jenkins deb repository
-      apt_repository:
-        repo: deb https://pkg.jenkins.io/debian binary/
+      ansible.builtin.apt_repository:
+        repo: deb https://pkg.jenkins.io/debian-stable binary/
+        state: present
     - name: Install Jenkins
       apt:
         name:
-          - jenkins-2.319.3
-        state: latest
+          - jenkins=2.332.1
     - name: Stop Jenkins (autostarts after install)
       systemd:
         name: jenkins
@@ -79,26 +79,23 @@
         - '/var/cache/jenkins/tmp'
         - '/var/cache/jenkins/heapdumps'
         - '/var/lib/jenkins'
-    - name: Update JAVA_ARGS
-      lineinfile:
-        path: "/etc/default/jenkins"
-        regexp: ".*-Djava.awt.headless=true.*"
-        line: 'JAVA_ARGS="-Djava.awt.headless=true -Djava.io.tmpdir=/var/cache/$NAME/tmp/ -Dorg.apache.commons.jelly.tags.fmt.timeZone=America/New_York -Duser.timezone=America/New_York"'
-        state: present
-    - name: Update JENKINS_ARGS
-      lineinfile:
-        path: "/etc/default/jenkins"
-        regexp: ".*JENKINS_ARGS=.*"
-        line: 'JENKINS_ARGS="--webroot=/var/cache/$NAME/war --httpPort=$HTTP_PORT --pluginroot=/var/cache/$NAME/plugins"'
-        state: present
+    - name: Create directory for systemd override file
+      file:
+        path: "{{ item }}"
+        state: directory
+        owner: root
+        group: root
+        recurse: yes
+      with_items:
+        - '/etc/systemd/system/jenkins.service.d'
     - name: Create limits file
       copy:
-        dest: "/etc/security/limits.d/30-jenkins.conf"
-        src: "30-jenkins.conf"
+        dest: "/etc/systemd/system/jenkins.service.d/override.conf"
+        src: "override.conf"
     - name: start jenkins service
       systemd:
         name: jenkins
-        state: started
+        state: restarted
 
 - name: Agent installation
   hosts: agents
@@ -123,12 +120,13 @@
           - runc 
         state: absent
     - name: add docker-ce apt key
-      apt_key:
+      ansible.builtin.apt_key:
         url: https://download.docker.com/linux/ubuntu/gpg
         state: present
     - name: docker-ce-stable deb repository
-      apt_repository:
+      ansible.builtin.apt_repository:
         repo: deb [arch=amd64] https://download.docker.com/linux/ubuntu focal stable
+        state: present
     - name: Install Docker
       apt:
         name: 
@@ -150,7 +148,7 @@
     - name: start Docker service
       systemd:
         name: docker
-        state: started        
+        state: restarted        
     - name: create Maven directory
       file: 
         path: "/opt/tools/maven"
