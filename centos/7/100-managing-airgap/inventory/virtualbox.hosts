@@ -2,7 +2,7 @@
 ansible_ssh_common_args='-o StrictHostKeyChecking=no'
 
 [jenkins_controllers]
-jenkins ansible_ssh_host=192.168.32.13 ansible_ssh_port=22 ansible_user=vagrant ansible_ssh_private_key_file=.vagrant/machines/jenkins/virtualbox/private_key
+jenkins ansible_ssh_host=192.168.56.13 ansible_ssh_port=22 ansible_user=vagrant ansible_ssh_private_key_file=.vagrant/machines/jenkins/virtualbox/private_key
 
 [nexus_servers]
-nexus ansible_ssh_host=192.168.32.11 ansible_ssh_port=22 ansible_user=vagrant ansible_ssh_private_key_file=.vagrant/machines/nexus/virtualbox/private_key
+nexus ansible_ssh_host=192.168.56.11 ansible_ssh_port=22 ansible_user=vagrant ansible_ssh_private_key_file=.vagrant/machines/nexus/virtualbox/private_key

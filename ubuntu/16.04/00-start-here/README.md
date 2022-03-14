@@ -6,8 +6,8 @@
 * add the following entries to your local `/etc/hosts`:
 
 ```
-192.168.32.13 jenkins
-192.168.32.15 agent1
+192.168.56.13 jenkins
+192.168.56.15 agent1
 ```
 
 ## Startup
@@ -35,8 +35,8 @@ jenkins hard nproc 30654
 *  add the following entries to `/etc/hosts`:
 
 ```
-192.168.32.13 jenkins
-192.168.32.15 agent1
+192.168.56.13 jenkins
+192.168.56.15 agent1
 ```
 
 * install AdoptOpenJDK 11
@@ -89,8 +89,8 @@ jenkins hard nproc 30654
 *  add the following entries to `/etc/hosts`:
 
 ```
-192.168.32.13 jenkins
-192.168.32.15 agent1
+192.168.56.13 jenkins
+192.168.56.15 agent1
 ```
 * install AdoptOpenJDK 11
   * `apt-get -y install wget apt-transport-https gnupg`
