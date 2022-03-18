@@ -172,19 +172,19 @@
         owner: vagrant
         group: vagrant
         recurse: yes
-    - name: download cosign 1.4.0
+    - name: download cosign 1.6.0
       get_url:
-        url: https://github.com/sigstore/cosign/releases/download/v1.4.0/cosign-linux-amd64
+        url: https://github.com/sigstore/cosign/releases/download/v1.6.0/cosign-linux-amd64
         dest: /opt/tools/cosign/cosign
         mode: '0755'
-    - name: download cosigned 1.4.0
+    - name: download cosigned 1.6.0
       get_url:
-        url: https://github.com/sigstore/cosign/releases/download/v1.4.0/cosigned-linux-amd64
+        url: https://github.com/sigstore/cosign/releases/download/v1.6.0/cosigned-linux-amd64
         dest: /opt/tools/cosign/cosigned
         mode: '0755'
-    - name: download sget 1.4.0
+    - name: download sget 1.6.0
       get_url:
-        url: https://github.com/sigstore/cosign/releases/download/v1.4.0/sget-linux-amd64
+        url: https://github.com/sigstore/cosign/releases/download/v1.6.0/sget-linux-amd64
         dest: /opt/tools/cosign/sget
         mode: '0755'
     - name: setup cosign profile
