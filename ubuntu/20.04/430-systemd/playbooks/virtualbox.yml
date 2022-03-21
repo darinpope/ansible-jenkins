@@ -73,6 +73,18 @@
         - '/var/cache/jenkins/tmp'
         - '/var/cache/jenkins/heapdumps'
         - '/var/lib/jenkins'
+    - name: Update JAVA_ARGS
+      lineinfile:
+        path: "/etc/default/jenkins"
+        regexp: ".*-Djava.awt.headless=true.*"
+        line: 'JAVA_ARGS="-Djava.awt.headless=true -Djava.io.tmpdir=/var/cache/$NAME/tmp/ -Dorg.apache.commons.jelly.tags.fmt.timeZone=America/New_York -Duser.timezone=America/New_York"'
+        state: present
+    - name: Update JENKINS_ARGS
+      lineinfile:
+        path: "/etc/default/jenkins"
+        regexp: ".*JENKINS_ARGS=.*"
+        line: 'JENKINS_ARGS="--webroot=/var/cache/$NAME/war --httpPort=$HTTP_PORT --pluginroot=/var/cache/$NAME/plugins"'
+        state: present
     - name: start jenkins service
       systemd:
         name: jenkins
