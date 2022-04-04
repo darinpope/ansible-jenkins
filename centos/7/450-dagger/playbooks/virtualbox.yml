@@ -172,6 +172,23 @@
         dest: /etc/profile.d/dagger.sh
         content: |
           PATH=/opt/tools/dagger:$PATH
+    - name: create cosign directory
+      file: 
+        path: "/opt/tools/cosign"
+        state: directory
+        owner: vagrant
+        group: vagrant
+        recurse: yes
+    - name: download cosign 1.6.0
+      get_url:
+        url: https://github.com/sigstore/cosign/releases/download/v1.6.0/cosign-linux-amd64
+        dest: /opt/tools/cosign/cosign
+        mode: '0755'
+    - name: setup cosign profile
+      copy:
+        dest: /etc/profile.d/cosign.sh
+        content: |
+          PATH=/opt/tools/cosign:$PATH
     - name: set final ownership to /opt/tools
       file: 
         path: "/opt/tools"
