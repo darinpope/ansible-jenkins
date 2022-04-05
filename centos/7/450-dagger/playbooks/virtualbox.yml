@@ -162,9 +162,9 @@
         owner: vagrant
         group: vagrant
         recurse: yes
-    - name: download dagger 0.2.4
+    - name: download dagger 0.2.5
       unarchive:
-        src: https://github.com/dagger/dagger/releases/download/v0.2.4/dagger_v0.2.4_linux_amd64.tar.gz
+        src: https://github.com/dagger/dagger/releases/download/v0.2.5/dagger_v0.2.5_linux_amd64.tar.gz
         dest: /opt/tools/dagger
         remote_src: yes
     - name: setup dagger profile
