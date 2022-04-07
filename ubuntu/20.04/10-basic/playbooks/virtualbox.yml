@@ -59,7 +59,7 @@
     - name: Install Jenkins
       apt:
         name:
-          - jenkins=2.332.1
+          - jenkins=2.332.2
     - name: Stop Jenkins (autostarts after install)
       systemd:
         name: jenkins
