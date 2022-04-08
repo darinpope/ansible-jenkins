@@ -172,6 +172,23 @@
         dest: /etc/profile.d/task.sh
         content: |
           PATH=/opt/tools/task:$PATH
+    - name: create ffmpeg directory
+      file: 
+        path: "/opt/tools/ffmpeg"
+        state: directory
+        owner: vagrant
+        group: vagrant
+        recurse: yes
+    - name: download ffmpeg 5.0.1
+      unarchive:
+        src: https://johnvansickle.com/ffmpeg/releases/ffmpeg-release-amd64-static.tar.xz
+        dest: /opt/tools/ffmpeg
+        remote_src: yes
+    - name: setup ffmpeg profile
+      copy:
+        dest: /etc/profile.d/ffmpeg.sh
+        content: |
+          PATH=/opt/tools/ffmpeg/ffmpeg-5.0.1-amd64-static:$PATH
     - name: set final ownership to /opt/tools
       file: 
         path: "/opt/tools"
