@@ -40,6 +40,8 @@
           - wget
           - epel-release
           - unzip
+          - ntp
+          - ntpdate
         state: latest
       
 - name: Jenkins installation
