@@ -39,6 +39,7 @@
           - git
           - wget
           - epel-release
+          - unzip
         state: latest
       
 - name: Jenkins installation
@@ -96,3 +97,50 @@
       systemd:
         name: jenkins
         state: restarted
+
+- name: Agent installation
+  hosts: agents
+  become: yes
+  tasks:
+    - name: enable and start firewalld service
+      systemd:
+        name: firewalld
+        state: started
+        enabled: yes
+    - name: permit traffic in default zone on port 22/tcp
+      ansible.posix.firewalld:
+        port: 22/tcp
+        permanent: yes
+        state: enabled
+        immediate: yes
+    - name: create Gradle directory
+      file: 
+        path: "/opt/tools/gradle"
+        state: directory
+        owner: vagrant
+        group: vagrant
+        recurse: yes
+    - name: download Gradle 6.9.2
+      unarchive:
+        src: https://services.gradle.org/distributions/gradle-6.9.2-bin.zip
+        dest: /opt/tools/gradle
+        remote_src: yes
+    - name: create Gradle latest symlink
+      file: 
+        src: /opt/tools/gradle/gradle-6.9.2
+        dest: /opt/tools/gradle/latest
+        owner: vagrant
+        group: vagrant
+        state: link
+    - name: setup Gradle profile
+      copy:
+        dest: /etc/profile.d/gradle.sh
+        content: |
+          PATH=/opt/tools/gradle/latest/bin:$PATH
+    - name: set final ownership to /opt/tools
+      file: 
+        path: "/opt/tools"
+        state: directory
+        owner: vagrant
+        group: vagrant
+        recurse: yes        
