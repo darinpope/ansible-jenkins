@@ -139,11 +139,6 @@
         owner: vagrant
         group: vagrant
         state: link
-    - name: setup Gradle profile
-      copy:
-        dest: /etc/profile.d/gradle.sh
-        content: |
-          PATH=/opt/tools/gradle/latest/bin:$PATH
     - name: set final ownership to /opt/tools
       file: 
         path: "/opt/tools"
