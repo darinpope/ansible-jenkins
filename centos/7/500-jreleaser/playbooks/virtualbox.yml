@@ -144,6 +144,23 @@
         content: |
           PATH=/opt/tools/graalvm/graalvm-ce-java17-22.1.0/bin:$PATH
           JAVA_HOME=/opt/tools/graalvm
+    - name: create jreleaser directory
+      file: 
+        path: "/opt/tools/jreleaser"
+        state: directory
+        owner: vagrant
+        group: vagrant
+        recurse: yes
+    - name: download jreleaser 1.0.0
+      unarchive:
+        src: https://github.com/jreleaser/jreleaser/releases/download/v1.0.0/jreleaser-1.0.0.zip
+        dest: /opt/tools/jreleaser
+        remote_src: yes
+    - name: setup JReleaser profile
+      copy:
+        dest: /etc/profile.d/jreleaser.sh
+        content: |
+          PATH=/opt/tools/jreleaser/jreleaser-1.0.0/bin:$PATH
     - name: set final ownership to /opt/tools
       file: 
         path: "/opt/tools"
