@@ -126,50 +126,13 @@
         permanent: yes
         state: enabled
         immediate: yes
-    - name: remove any installed docker
-      yum:
-        name:
-          - docker
-          - docker-client
-          - docker-client-latest
-          - docker-common
-          - docker-latest
-          - docker-latest-logrotate
-          - docker-logrotate
-          - docker-engine
-        state: absent
-    - name: docker-ce-stable yum repository
-      yum_repository:
-        name: docker-ce-stable
-        description: Docker CE Stable - $basearch
-        baseurl: https://download.docker.com/linux/centos/7/$basearch/stable
-        enabled: yes
-        gpgcheck: yes
-        gpgkey: https://download.docker.com/linux/centos/gpg
     - name: Install Docker and unzip
       yum:
         name: 
-          - docker-ce
-          - docker-ce-cli
-          - containerd.io
           - unzip
           - gcc
+          - zlib-devel
         state: latest
-    - name: add docker group
-      group:
-        name: docker
-        state: present
-    - name: add $USER to docker group
-      user: 
-        name: "{{ ansible_user }}"
-        groups: docker
-        append: yes
-    - name: do a ssh reset in order to reflect the $USER group changes
-      meta: reset_connection
-    - name: start Docker service
-      systemd:
-        name: docker
-        state: restarted        
     - name: create GraalVM directory
       file: 
         path: "/opt/tools/graalvm"
