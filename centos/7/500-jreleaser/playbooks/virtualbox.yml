@@ -153,6 +153,7 @@
           - docker-ce-cli
           - containerd.io
           - unzip
+          - gcc
         state: latest
     - name: add docker group
       group:
