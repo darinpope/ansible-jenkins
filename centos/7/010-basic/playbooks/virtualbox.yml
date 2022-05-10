@@ -139,6 +139,7 @@
           - docker-ce-cli
           - containerd.io
           - unzip
+          - tree
         state: latest
     - name: add docker group
       group:
