@@ -126,11 +126,68 @@
         permanent: yes
         state: enabled
         immediate: yes
-    - name: Install unzip
+    - name: remove any installed docker
+      yum:
+        name:
+          - docker
+          - docker-client
+          - docker-client-latest
+          - docker-common
+          - docker-latest
+          - docker-latest-logrotate
+          - docker-logrotate
+          - docker-engine
+        state: absent
+    - name: docker-ce-stable yum repository
+      yum_repository:
+        name: docker-ce-stable
+        description: Docker CE Stable - $basearch
+        baseurl: https://download.docker.com/linux/centos/7/$basearch/stable
+        enabled: yes
+        gpgcheck: yes
+        gpgkey: https://download.docker.com/linux/centos/gpg
+    - name: Install Docker and unzip
       yum:
         name: 
+          - docker-ce
+          - docker-ce-cli
+          - containerd.io
           - unzip
+          - tree
         state: latest
+    - name: add docker group
+      group:
+        name: docker
+        state: present
+    - name: add $USER to docker group
+      user: 
+        name: "{{ ansible_user }}"
+        groups: docker
+        append: yes
+    - name: do a ssh reset in order to reflect the $USER group changes
+      meta: reset_connection
+    - name: start Docker service
+      systemd:
+        name: docker
+        state: restarted        
+    - name: create GraalVM directory
+      file: 
+        path: "/opt/tools/graalvm"
+        state: directory
+        owner: vagrant
+        group: vagrant
+        recurse: yes
+    - name: download GraalVM 22.1.0
+      unarchive:
+        src: https://github.com/graalvm/graalvm-ce-builds/releases/download/vm-22.1.0/graalvm-ce-java17-linux-amd64-22.1.0.tar.gz
+        dest: /opt/tools/graalvm
+        remote_src: yes
+    - name: setup GraalVM profile
+      copy:
+        dest: /etc/profile.d/graalvm.sh
+        content: |
+          PATH=/opt/tools/graalvm/graalvm-ce-java17-22.1.0/bin:$PATH
+          JAVA_HOME=/opt/tools/graalvm
     - name: create fly directory
       file: 
         path: "/opt/tools/fly"
