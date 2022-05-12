@@ -154,6 +154,8 @@
           - containerd.io
           - unzip
           - tree
+          - gcc
+          - zlib-devel
         state: latest
     - name: add docker group
       group:
