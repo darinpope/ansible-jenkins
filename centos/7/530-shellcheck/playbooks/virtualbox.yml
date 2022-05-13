@@ -1,0 +1,157 @@
+---
+- name: Install base software on all
+  hosts: all
+  gather_facts: yes
+  become: yes
+  tasks:
+    - name: update hosts
+      lineinfile:
+        path: "/etc/hosts"
+        regexp: ".*\t{{ hostvars[item]['ansible_hostname']}}\t{{ hostvars[item]['ansible_hostname']}}"
+        line: "{{ hostvars[item]['ansible_ssh_host'] }}\t{{ hostvars[item]['ansible_hostname']}}\t{{ hostvars[item]['ansible_hostname']}}"
+        state: present
+        backup: yes
+      with_items: "{{ ansible_play_batch }}"       
+    - name: Adoptium yum repository
+      yum_repository:
+        name: Adoptium
+        description: Adoptium
+        baseurl: https://packages.adoptium.net/artifactory/rpm/centos/$releasever/$basearch
+        enabled: yes
+        gpgcheck: yes
+        gpgkey: https://packages.adoptium.net/artifactory/api/gpg/key/public
+    - name: Endpoint yum repository
+      yum_repository:
+        name: endpoint
+        description: End Point repository
+        baseurl: https://packages.endpointdev.com/rhel/$releasever/os/$basearch/
+        enabled: yes
+        gpgcheck: yes
+        gpgkey: https://packages.endpointdev.com/endpoint-rpmsign-7.pub
+    - name: remove any installed git
+      yum:
+        name: git
+        state: absent
+    - name: Install fontconfig, AdoptOpenJDK and git
+      yum:
+        name:
+          - temurin-11-jdk
+          - git
+          - wget
+          - epel-release
+          - unzip
+          - ntp
+          - ntpdate
+        state: latest
+    - name: enable ntpd
+      systemd:
+        name: ntpd
+        state: restarted
+        enabled: yes    
+      
+- name: Jenkins installation
+  hosts: jenkins_controllers
+  become: yes
+  tasks:
+    - name: enable and start firewalld service
+      systemd:
+        name: firewalld
+        state: started
+        enabled: yes
+    - name: permit traffic in default zone on port 8080/tcp
+      ansible.posix.firewalld:
+        port: 8080/tcp
+        permanent: yes
+        state: enabled
+        immediate: yes
+    - name: permit traffic in default zone on port 50000/tcp
+      ansible.posix.firewalld:
+        port: 50000/tcp
+        permanent: yes
+        state: enabled
+        immediate: yes
+    - name: jenkins yum repository
+      yum_repository:
+        name: jenkins
+        description: Jenkins-stable
+        baseurl: http://pkg.jenkins.io/redhat-stable
+        enabled: yes
+        gpgcheck: yes
+        gpgkey: https://pkg.jenkins.io/redhat-stable/jenkins.io.key
+    - name: Install Jenkins
+      yum:
+        name:
+          - jenkins-2.332.3
+        state: latest
+    - name: Create directories for Jenkins
+      file:
+        path: "{{ item }}"
+        state: directory
+        owner: jenkins
+        group: jenkins
+        recurse: yes
+      with_items:
+        - '/var/cache/jenkins/tmp'
+        - '/var/cache/jenkins/heapdumps'
+    - name: Create directory for systemd override file
+      file:
+        path: "{{ item }}"
+        state: directory
+        owner: root
+        group: root
+        recurse: yes
+      with_items:
+        - '/etc/systemd/system/jenkins.service.d'
+    - name: Create limits file
+      copy:
+        dest: "/etc/systemd/system/jenkins.service.d/override.conf"
+        src: "override.conf"
+    - name: start jenkins service
+      systemd:
+        name: jenkins
+        state: restarted
+
+- name: Agent installation
+  hosts: agents
+  become: yes
+  tasks:
+    - name: enable and start firewalld service
+      systemd:
+        name: firewalld
+        state: started
+        enabled: yes
+    - name: permit traffic in default zone on port 22/tcp
+      ansible.posix.firewalld:
+        port: 22/tcp
+        permanent: yes
+        state: enabled
+        immediate: yes
+    - name: Install unzip
+      yum:
+        name: 
+          - unzip
+        state: latest
+    - name: create ShellCheck directory
+      file: 
+        path: "/opt/tools/shellcheck"
+        state: directory
+        owner: vagrant
+        group: vagrant
+        recurse: yes
+    - name: download ShellCheck 0.8.0
+      unarchive:
+        src: https://github.com/koalaman/shellcheck/releases/download/v0.8.0/shellcheck-v0.8.0.linux.x86_64.tar.xz
+        dest: /opt/tools/shellcheck
+        remote_src: yes
+    - name: setup ShellCheck profile
+      copy:
+        dest: /etc/profile.d/shellcheck.sh
+        content: |
+          PATH=/opt/tools/shellcheck/shellcheck-v0.8.0:$PATH
+    - name: set final ownership to /opt/tools
+      file: 
+        path: "/opt/tools"
+        state: directory
+        owner: vagrant
+        group: vagrant
+        recurse: yes
