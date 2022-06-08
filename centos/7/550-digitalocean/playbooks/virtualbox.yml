@@ -112,14 +112,9 @@
         permanent: yes
         state: enabled
         immediate: yes
-    - name: Install unzip
-      yum:
-        name: 
-          - unzip
-        state: latest
-    - name: create task directory
+    - name: create doctl directory
       file: 
-        path: "/opt/tools/task"
+        path: "/opt/tools/doctl"
         state: directory
         owner: vagrant
         group: vagrant
