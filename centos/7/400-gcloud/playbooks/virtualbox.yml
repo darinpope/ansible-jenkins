@@ -113,7 +113,7 @@
         permanent: yes
         state: enabled
         immediate: yes
-    - name: Google Cloud SDK yum repository
+    - name: Google Cloud CLI yum repository
       yum_repository:
         name: google-cloud-cli
         description: Google Cloud CLI
@@ -127,5 +127,5 @@
     - name: Install Docker and unzip
       yum:
         name: 
-          - google-cloud-sdk
+          - google-cloud-cli
         state: latest
