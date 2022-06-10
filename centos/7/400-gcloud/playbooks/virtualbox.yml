@@ -67,7 +67,7 @@
     - name: Install Jenkins
       yum:
         name:
-          - jenkins-2.319.3
+          - jenkins-2.332.3
         state: latest
     - name: Create directories for Jenkins
       file:
@@ -79,26 +79,24 @@
       with_items:
         - '/var/cache/jenkins/tmp'
         - '/var/cache/jenkins/heapdumps'
-    - name: Update JENKINS_JAVA_OPTIONS
-      lineinfile:
-        path: "/etc/sysconfig/jenkins"
-        regexp: ".*-Djava.awt.headless=true.*"
-        line: 'JENKINS_JAVA_OPTIONS="-Djava.awt.headless=true -Djava.net.preferIPv4Stack=true -Djava.io.tmpdir=/var/cache/jenkins/tmp/ -Dorg.apache.commons.jelly.tags.fmt.timeZone=America/New_York -Duser.timezone=America/New_York"'
-        state: present
-    - name: Update JENKINS_ARGS
-      lineinfile:
-        path: "/etc/sysconfig/jenkins"
-        regexp: ".*JENKINS_ARGS=.*"
-        line: 'JENKINS_ARGS="--pluginroot=/var/cache/jenkins/plugins"'
-        state: present
+    - name: Create directory for systemd override file
+      file:
+        path: "{{ item }}"
+        state: directory
+        owner: root
+        group: root
+        recurse: yes
+      with_items:
+        - '/etc/systemd/system/jenkins.service.d'
     - name: Create limits file
       copy:
-        dest: "/etc/security/limits.d/30-jenkins.conf"
-        src: "30-jenkins.conf"
+        dest: "/etc/systemd/system/jenkins.service.d/override.conf"
+        src: "override.conf"
     - name: start jenkins service
       systemd:
         name: jenkins
         state: restarted
+        enabled: yes
 
 - name: Agent installation
   hosts: agents
@@ -115,26 +113,6 @@
         permanent: yes
         state: enabled
         immediate: yes
-    - name: remove any installed docker
-      yum:
-        name:
-          - docker
-          - docker-client
-          - docker-client-latest
-          - docker-common
-          - docker-latest
-          - docker-latest-logrotate
-          - docker-logrotate
-          - docker-engine
-        state: absent
-    - name: docker-ce-stable yum repository
-      yum_repository:
-        name: docker-ce-stable
-        description: Docker CE Stable - $basearch
-        baseurl: https://download.docker.com/linux/centos/7/$basearch/stable
-        enabled: yes
-        gpgcheck: yes
-        gpgkey: https://download.docker.com/linux/centos/gpg
     - name: Google Cloud SDK yum repository
       yum_repository:
         name: google-cloud-sdk
@@ -149,24 +127,5 @@
     - name: Install Docker and unzip
       yum:
         name: 
-          - docker-ce
-          - docker-ce-cli
-          - containerd.io
-          - unzip
           - google-cloud-sdk
         state: latest
-    - name: add docker group
-      group:
-        name: docker
-        state: present
-    - name: add $USER to docker group
-      user: 
-        name: "{{ ansible_user }}"
-        groups: docker
-        append: yes
-    - name: do a ssh reset in order to reflect the $USER group changes
-      meta: reset_connection
-    - name: start Docker service
-      systemd:
-        name: docker
-        state: restarted        
