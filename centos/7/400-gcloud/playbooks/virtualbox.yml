@@ -124,7 +124,7 @@
         gpgkey: 
           - https://packages.cloud.google.com/yum/doc/yum-key.gpg
           - https://packages.cloud.google.com/yum/doc/rpm-package-key.gpg
-    - name: Install Docker and unzip
+    - name: Install Google Cloud CLI
       yum:
         name: 
           - google-cloud-cli
