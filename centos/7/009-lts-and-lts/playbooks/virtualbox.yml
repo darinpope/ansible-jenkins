@@ -73,7 +73,7 @@
     - name: Install Jenkins
       yum:
         name:
-          - jenkins-2.319.3
+          - jenkins-2.332.4
     - name: Create directories for Jenkins
       file:
         path: "{{ item }}"
@@ -101,6 +101,7 @@
       systemd:
         name: jenkins
         state: restarted
+        enabled: yes
 
 
 - name: Jenkins new installation
@@ -127,7 +128,7 @@
     - name: Install Jenkins
       yum:
         name:
-          - jenkins-2.332.3
+          - jenkins-2.346.1
     - name: Create directories for Jenkins
       file:
         path: "{{ item }}"
@@ -155,3 +156,4 @@
       systemd:
         name: jenkins
         state: restarted
+        enabled: yes
