@@ -88,6 +88,30 @@
         name: jenkins
         state: restarted
         enabled: yes
+    - name: create cloudflared directory
+      file: 
+        path: "/opt/tools/cloudflared"
+        state: directory
+        owner: vagrant
+        group: vagrant
+        recurse: yes
+    - name: download cloudflared 2022.6.3
+      get_url:
+        url: https://github.com/cloudflare/cloudflared/releases/download/2022.6.3/cloudflared-linux-amd64
+        dest: /opt/tools/cloudflared/cloudflared
+        mode: '0755'
+    - name: setup cloudflared profile
+      copy:
+        dest: /etc/profile.d/cloudflared.sh
+        content: |
+          PATH=/opt/tools/cloudflared:$PATH
+    - name: set final ownership to /opt/tools
+      file: 
+        path: "/opt/tools"
+        state: directory
+        owner: vagrant
+        group: vagrant
+        recurse: yes    
 
 - name: Agent installation
   hosts: agents
