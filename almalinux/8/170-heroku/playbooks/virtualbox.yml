@@ -148,7 +148,7 @@
       systemd:
         name: docker
         state: restarted   
-        enable: yes     
+        enabled: yes     
     - name: create Heroku directory
       file: 
         path: "/opt/tools/heroku"
