@@ -147,8 +147,8 @@
     - name: start Docker service
       systemd:
         name: docker
-        state: restarted   
-        enable: yes     
+        state: restarted
+        enabled: yes
     - name: set final ownership to /opt/tools
       file: 
         path: "/opt/tools"
