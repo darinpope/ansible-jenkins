@@ -95,9 +95,9 @@
         owner: vagrant
         group: vagrant
         recurse: yes
-    - name: download cloudflared 2022.8.4
+    - name: download cloudflared 2022.9.0
       get_url:
-        url: https://github.com/cloudflare/cloudflared/releases/download/2022.8.4/cloudflared-linux-amd64
+        url: https://github.com/cloudflare/cloudflared/releases/download/2022.9.0/cloudflared-linux-amd64
         dest: /opt/tools/cloudflared/cloudflared
         mode: '0755'
     - name: setup cloudflared profile
