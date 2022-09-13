@@ -24,12 +24,11 @@
       dnf:
         name: git
         state: absent
-    - name: Install temurin and git
+    - name: Install git
       dnf:
         name:
-          - temurin-17-jdk
           - git
-          - wget
+          - temurin-17-jdk
         state: latest
       
 - name: Jenkins installation
@@ -55,7 +54,7 @@
         enabled: yes
         gpgcheck: yes
         gpgkey: https://pkg.jenkins.io/redhat-stable/jenkins.io.key
-    - name: Install Jenkins
+    - name: Install JDK and Jenkins
       dnf:
         name:
           - jenkins-2.361.1
@@ -88,6 +87,22 @@
         name: jenkins
         state: restarted
         enabled: yes
+
+- name: Tunnel installation
+  hosts: tunnels
+  become: yes
+  tasks:
+    - name: enable and start firewalld service
+      systemd:
+        name: firewalld
+        state: started
+        enabled: yes
+    - name: permit traffic in default zone on port 22/tcp
+      ansible.posix.firewalld:
+        port: 22/tcp
+        permanent: yes
+        state: enabled
+        immediate: yes
     - name: create cloudflared directory
       file: 
         path: "/opt/tools/cloudflared"
@@ -105,3 +120,10 @@
         dest: /etc/profile.d/cloudflared.sh
         content: |
           PATH=/opt/tools/cloudflared:$PATH
+    - name: set final ownership to /opt/tools
+      file: 
+        path: "/opt/tools"
+        state: directory
+        owner: vagrant
+        group: vagrant
+        recurse: yes

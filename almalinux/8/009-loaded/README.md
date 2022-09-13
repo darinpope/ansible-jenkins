@@ -1,57 +1,18 @@
-# basic
+# loaded
 
-## Prerequisites
+The controller needs extra HDD. To do that, first run:
 
-* `ansible-galaxy collection install -r requirements.yml`
+vagrant plugin install vagrant-disksize
 
-## Startup
+then
 
-* `vagrant up`
-* `ansible-playbook -i inventory/virtualbox.hosts playbooks/virtualbox.yml`
+vagrant up
 
-## Setup Jenkins UI
+then ssh into the box and
 
-* vagrant ssh jenkins
-  * `sudo cat /var/lib/jenkins/secrets/initialAdminPassword`
-* Install suggested plugins
-* Create First Admin User
-* Jenkins URL: http://jenkins:8080/
-* Click Start using Jenkins
-* http://jenkins:8080/restart
+sudo cfdisk /dev/sda
 
-## Connect agent to Jenkins
+sudo xfs_growfs /dev/sda2
 
-* change master to 0
-* connect agent
+https://stackoverflow.com/a/60185312
 
-## Create test job
-
-```
-pipeline {
-  agent {label "linux"}
-  stages {
-    stage("Hello") {
-      steps {
-        sh """
-          mvn --version
-          gradle --version
-          docker info
-        """
-      }
-    }
-  }
-}
-```
-
-## Update plugins
-
-* remove
-  * `ant`
-  * `gradle`
-* install
-  * `pipeline-utility-steps`
-  * `configuration-as-code`
-
-## Cleanup
-
-* `vagrant halt; vagrant destroy -f`
