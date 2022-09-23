@@ -1,0 +1,88 @@
+---
+- name: Install base software on all
+  hosts: all
+  gather_facts: yes
+  become: yes
+  tasks:
+    - name: update hosts
+      lineinfile:
+        path: "/etc/hosts"
+        regexp: ".*\t{{ hostvars[item]['ansible_hostname']}}\t{{ hostvars[item]['ansible_hostname']}}"
+        line: "{{ hostvars[item]['ansible_ssh_host'] }}\t{{ hostvars[item]['ansible_hostname']}}\t{{ hostvars[item]['ansible_hostname']}}"
+        state: present
+        backup: yes
+      with_items: "{{ ansible_play_batch }}"       
+      
+- name: Gitea installation
+  hosts: gitea_servers
+  become: yes
+  tasks:
+    - name: enable and start firewalld service
+      systemd:
+        name: firewalld
+        state: started
+        enabled: yes
+    - name: permit traffic in default zone on port 22/tcp
+      ansible.posix.firewalld:
+        port: 22/tcp
+        permanent: yes
+        state: enabled
+        immediate: yes
+    - name: remove any installed docker
+      dnf:
+        name:
+          - docker
+          - docker-client
+          - docker-client-latest
+          - docker-common
+          - docker-latest
+          - docker-latest-logrotate
+          - docker-logrotate
+          - docker-engine
+        state: absent
+    - name: docker-ce-stable yum repository
+      yum_repository:
+        name: docker-ce-stable
+        description: Docker CE Stable - $basearch
+        baseurl: https://download.docker.com/linux/centos/8/$basearch/stable
+        enabled: yes
+        gpgcheck: yes
+        gpgkey: https://download.docker.com/linux/centos/gpg
+    - name: Install Docker and unzip
+      dnf:
+        name: 
+          - docker-ce
+          - docker-ce-cli
+          - containerd.io
+          - unzip
+          - tree
+        state: latest
+    - name: add docker group
+      group:
+        name: docker
+        state: present
+    - name: add $USER to docker group
+      user: 
+        name: "{{ ansible_user }}"
+        groups: docker
+        append: yes
+    - name: do a ssh reset in order to reflect the $USER group changes
+      meta: reset_connection
+    - name: start Docker service
+      systemd:
+        name: docker
+        state: restarted
+        enabled: yes
+    - name: create compose directory
+      file: 
+        path: "/usr/local/lib/docker/cli-plugins"
+        state: directory
+    - name: download Docker Compose 2.11.1
+      get_url:
+        url: https://github.com/docker/compose/releases/download/v2.11.1/docker-compose-linux-x86_64
+        dest: /usr/local/lib/docker/cli-plugins/docker-compose
+        mode: '0755'
+    - name: Create docker compose file
+      copy:
+        dest: "/home/vagrant/docker-compose.yml"
+        src: "docker-compose.yml"
