@@ -57,7 +57,7 @@
     - name: Install JDK and Jenkins
       dnf:
         name:
-          - jenkins-2.361.1
+          - jenkins-2.361.2
         state: latest
     - name: Create directories for Jenkins
       file:
