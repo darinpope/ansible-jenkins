@@ -149,6 +149,23 @@
         name: docker
         state: restarted
         enabled: yes
+    - name: create atlas directory
+      file: 
+        path: "/opt/tools/atlas"
+        state: directory
+        owner: vagrant
+        group: vagrant
+        recurse: yes
+    - name: download atlas
+      get_url:
+        url: https://release.ariga.io/atlas/atlas-linux-amd64-latest
+        dest: /opt/tools/atlas/atlas
+        mode: '0755'
+    - name: setup atlas profile
+      copy:
+        dest: /etc/profile.d/atlas.sh
+        content: |
+          PATH=/opt/tools/atlas:$PATH    
     - name: set final ownership to /opt/tools
       file: 
         path: "/opt/tools"
