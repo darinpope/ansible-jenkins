@@ -158,7 +158,7 @@
         recurse: yes
     - name: download Act
       unarchive:
-        src: https://github.com/nektos/act/releases/download/v0.2.34/act_Linux_x86_64.tar.gz
+        src: https://github.com/nektos/act/releases/download/v0.2.35/act_Linux_x86_64.tar.gz
         dest: /opt/tools/act
         remote_src: yes
     - name: setup Act profile
