@@ -91,24 +91,46 @@
 
 - name: Agent installation
   hosts: agents
+  become: yes
   tasks:
     - name: enable and start firewalld service
-      become: yes
       systemd:
         name: firewalld
         state: started
         enabled: yes
     - name: permit traffic in default zone on port 22/tcp
-      become: yes
       ansible.posix.firewalld:
         port: 22/tcp
         permanent: yes
         state: enabled
         immediate: yes
-    - name: Install Docker and unzip
-      become: yes
+    - name: Install extra tools
       dnf:
         name: 
           - unzip
           - tree
         state: latest
+    - name: create rust directory
+      file: 
+        path: "/opt/tools/rust"
+        state: directory
+        owner: vagrant
+        group: vagrant
+        recurse: yes
+    - name: download Rust
+      unarchive:
+        src: https://static.rust-lang.org/dist/rust-1.66.0-x86_64-unknown-linux-gnu.tar.gz
+        dest: /opt/tools/rust
+        remote_src: yes
+    - name: setup Rust profile
+      copy:
+        dest: /etc/profile.d/rust.sh
+        content: |
+          PATH=/opt/tools/rust/rust-1.66.0-x86_64-unknown-linux-gnu:$PATH
+    - name: set final ownership to /opt/tools
+      file: 
+        path: "/opt/tools"
+        state: directory
+        owner: vagrant
+        group: vagrant
+        recurse: yes          
