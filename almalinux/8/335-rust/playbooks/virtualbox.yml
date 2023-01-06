@@ -91,40 +91,24 @@
 
 - name: Agent installation
   hosts: agents
-  become: yes
   tasks:
     - name: enable and start firewalld service
+      become: yes
       systemd:
         name: firewalld
         state: started
         enabled: yes
     - name: permit traffic in default zone on port 22/tcp
+      become: yes
       ansible.posix.firewalld:
         port: 22/tcp
         permanent: yes
         state: enabled
         immediate: yes
-    - name: run the jenkins-plugin-manager
-      become: yes
-      command: dnf check-update && dnf update -y
     - name: Install Docker and unzip
+      become: yes
       dnf:
         name: 
           - unzip
           - tree
-          - curl
-          - epel-release
-          - cmake
-          - gcc
-          - make
         state: latest
-    - name: install rustup
-      become: no
-      command: curl --proto '=https' --tlsv1.2 -sSf https://sh.rustup.rs | sh
-    - name: set final ownership to /opt/tools
-      file: 
-        path: "/opt/tools"
-        state: directory
-        owner: vagrant
-        group: vagrant
-        recurse: yes
