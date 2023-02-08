@@ -128,7 +128,7 @@
     - name: Install Jenkins
       yum:
         name:
-          - jenkins-2.375.2
+          - jenkins-2.375.3
     - name: Create directories for Jenkins
       file:
         path: "{{ item }}"
