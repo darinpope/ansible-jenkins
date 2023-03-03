@@ -71,6 +71,15 @@
       with_items:
         - '/var/cache/jenkins/tmp'
         - '/var/cache/jenkins/heapdumps'
+    - name: Create directory for systemd override file
+      file:
+        path: "{{ item }}"
+        state: directory
+        owner: root
+        group: root
+        recurse: yes
+      with_items:
+        - '/etc/systemd/system/jenkins.service.d'
     - name: Create limits file
       copy:
         dest: "/etc/systemd/system/jenkins.service.d/override.conf"
