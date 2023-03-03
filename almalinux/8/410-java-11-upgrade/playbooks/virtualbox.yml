@@ -148,3 +148,27 @@
       systemd:
         name: docker
         state: restarted        
+    - name: create Deno directory
+      file: 
+        path: "/opt/tools/deno"
+        state: directory
+        owner: vagrant
+        group: vagrant
+        recurse: yes
+    - name: install Deno
+      ansible.builtin.shell: curl -fsSL https://deno.land/install.sh | DENO_INSTALL=/opt/tools/deno sh
+    - name: setup Deno profile
+      copy:
+        dest: /etc/profile.d/deno.sh
+        content: |
+          DENO_INSTALL=/opt/tools/deno
+          PATH=$DENO_INSTALL/bin:$PATH
+    - name: install Denoflare
+      shell: /opt/tools/deno/bin/deno install --unstable --allow-read --allow-net --allow-env --allow-run --root /opt/tools/deno --name denoflare --force https://raw.githubusercontent.com/skymethod/denoflare/v0.5.11/cli/cli.ts
+    - name: set final ownership to /opt/tools
+      file: 
+        path: "/opt/tools"
+        state: directory
+        owner: vagrant
+        group: vagrant
+        recurse: yes
