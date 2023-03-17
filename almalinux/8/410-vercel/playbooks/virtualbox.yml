@@ -108,7 +108,7 @@
     - name: install NodeJS
       dnf:
         name: '@nodejs:18/common'
-        state: latest
+        state: present
     - name: install Vercel CLI
       npm:
         name: vercel
