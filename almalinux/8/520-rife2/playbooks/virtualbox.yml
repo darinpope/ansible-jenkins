@@ -32,14 +32,7 @@
           - wget
           - epel-release
           - unzip
-          - ntp
-          - ntpdate
         state: latest
-    - name: enable ntpd
-      systemd:
-        name: ntpd
-        state: restarted
-        enabled: yes    
       
 - name: Jenkins installation
   hosts: jenkins_controllers
