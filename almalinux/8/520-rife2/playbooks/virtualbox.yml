@@ -27,7 +27,7 @@
     - name: Install
       yum:
         name:
-          - temurin-11-jdk
+          - temurin-17-jdk
           - git
           - wget
           - epel-release
