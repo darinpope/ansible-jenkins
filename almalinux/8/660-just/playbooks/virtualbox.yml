@@ -109,5 +109,25 @@
         name: 
           - unzip
           - tree
-          - just
         state: latest
+    - name: create just directory
+      file: 
+        path: "/opt/tools/just"
+        state: directory
+        owner: vagrant
+        group: vagrant
+        recurse: yes
+    - name: download just
+      command: "curl -fsSL https://just.systems/install.sh | bash -s -- --to /opt/tools/just"
+    - name: setup just profile
+      copy:
+        dest: /etc/profile.d/just.sh
+        content: |
+          PATH=/opt/tools/just:$PATH
+    - name: set final ownership to /opt/tools
+      file: 
+        path: "/opt/tools"
+        state: directory
+        owner: vagrant
+        group: vagrant
+        recurse: yes                
