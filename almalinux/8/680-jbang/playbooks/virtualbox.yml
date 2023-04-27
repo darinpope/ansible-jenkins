@@ -165,7 +165,7 @@
       copy:
         dest: /etc/profile.d/jbang.sh
         content: |
-          PATH=/opt/tools/jbang:$PATH
+          PATH=/opt/tools/jbang/jbang-0.106.3/bin:$PATH
     - name: set final ownership to /opt/tools
       file: 
         path: "/opt/tools"
