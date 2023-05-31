@@ -183,7 +183,7 @@
       copy:
         dest: /etc/profile.d/helm.sh
         content: |
-          PATH=/opt/tools/helm:$PATH
+          PATH=/opt/tools/helm/linux-amd64:$PATH
     - name: set final ownership to /opt/tools
       file: 
         path: "/opt/tools"
