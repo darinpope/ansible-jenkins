@@ -133,6 +133,7 @@
           - containerd.io
           - unzip
           - tree
+          - python3
         state: latest
     - name: add docker group
       group:
@@ -167,6 +168,25 @@
         dest: /etc/profile.d/cnspec.sh
         content: |
           PATH=/opt/tools/cnspec:$PATH
+    - name: create zig directory
+      file: 
+        path: "/opt/tools/zig"
+        state: directory
+        owner: vagrant
+        group: vagrant
+        recurse: yes
+    - name: download zig
+      unarchive:
+        src: https://ziglang.org/download/0.10.1/zig-linux-x86_64-0.10.1.tar.xz
+        dest: /opt/tools/zig
+        remote_src: yes
+    - name: setup zig profile
+      copy:
+        dest: /etc/profile.d/zig.sh
+        content: |
+          PATH=/opt/tools/zig/zig-linux-x86_64-0.10.1:$PATH    
+    - name: install pipx
+      command: python3 -m pip install --user pipx
     - name: set final ownership to /opt/tools
       file: 
         path: "/opt/tools"
