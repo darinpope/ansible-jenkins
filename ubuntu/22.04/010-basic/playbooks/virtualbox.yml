@@ -50,7 +50,7 @@
         proto: tcp
     - name: add Jenkins apt key
       ansible.builtin.apt_key:
-        url: https://pkg.jenkins.io/debian-stable/jenkins.io.key
+        url: https://pkg.jenkins.io/debian-stable/jenkins.io-2023.key
         state: present
     - name: Jenkins deb repository
       ansible.builtin.apt_repository:
