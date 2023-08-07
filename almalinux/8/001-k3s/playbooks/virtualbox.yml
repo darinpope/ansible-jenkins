@@ -75,7 +75,7 @@
     - name: Install Jenkins
       dnf:
         name:
-          - jenkins-2.401.2
+          - jenkins-2.401.3
         state: latest
     - name: Create directories for Jenkins
       file:
