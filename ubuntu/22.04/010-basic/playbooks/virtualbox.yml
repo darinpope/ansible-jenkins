@@ -23,7 +23,7 @@
     - name: Install common software
       apt:
         name:
-          - temurin-11-jdk
+          - temurin-17-jdk
           - apt-transport-https 
           - ca-certificates 
           - curl 
@@ -50,7 +50,7 @@
         proto: tcp
     - name: add Jenkins apt key
       ansible.builtin.apt_key:
-        url: https://pkg.jenkins.io/debian-stable/jenkins.io.key
+        url: https://pkg.jenkins.io/debian-stable/jenkins.io-2023.key
         state: present
     - name: Jenkins deb repository
       ansible.builtin.apt_repository:
@@ -59,7 +59,7 @@
     - name: Install Jenkins
       apt:
         name:
-          - jenkins=2.332.3
+          - jenkins=2.401.3
     - name: Stop Jenkins (autostarts after install)
       systemd:
         name: jenkins
@@ -96,6 +96,7 @@
       systemd:
         name: jenkins
         state: restarted
+        enabled: yes
 
 - name: Agent installation
   hosts: agents
@@ -148,55 +149,5 @@
     - name: start Docker service
       systemd:
         name: docker
-        state: restarted        
-    - name: create Maven directory
-      file: 
-        path: "/opt/tools/maven"
-        state: directory
-        owner: vagrant
-        group: vagrant
-        recurse: yes
-    - name: download Maven 3.8.5
-      unarchive:
-        src: https://mirrors.sonic.net/apache/maven/maven-3/3.8.5/binaries/apache-maven-3.8.5-bin.tar.gz
-        dest: /opt/tools/maven
-        remote_src: yes
-    - name: create Maven latest symlink
-      file: 
-        src: /opt/tools/maven/apache-maven-3.8.5
-        dest: /opt/tools/maven/latest
-        owner: vagrant
-        group: vagrant
-        state: link
-    - name: create Gradle directory
-      file: 
-        path: "/opt/tools/gradle"
-        state: directory
-        owner: vagrant
-        group: vagrant
-        recurse: yes
-    - name: download Gradle 7.2
-      unarchive:
-        src: https://services.gradle.org/distributions/gradle-7.2-bin.zip
-        dest: /opt/tools/gradle
-        remote_src: yes
-    - name: create Gradle latest symlink
-      file: 
-        src: /opt/tools/gradle/gradle-7.2
-        dest: /opt/tools/gradle/latest
-        owner: vagrant
-        group: vagrant
-        state: link
-    - name: Update PATH with Maven and Gradle
-      lineinfile:
-        path: "/etc/environment"
-        regexp: ".*PATH=.*"
-        line: 'PATH="/opt/tools/gradle/latest/bin:/opt/tools/maven/latest/bin:/usr/local/sbin:/usr/local/bin:/usr/sbin:/usr/bin:/sbin:/bin:/usr/games:/usr/local/games:/snap/bin"'
-        state: present
-    - name: set final ownership to /opt/tools
-      file: 
-        path: "/opt/tools"
-        state: directory
-        owner: vagrant
-        group: vagrant
-        recurse: yes
+        state: restarted   
+        enabled: yes
