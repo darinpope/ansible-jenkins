@@ -27,7 +27,7 @@
         baseurl: http://pkg.jenkins.io/redhat-stable
         enabled: yes
         gpgcheck: yes
-        gpgkey: https://pkg.jenkins.io/redhat-stable/jenkins.io.key
+        gpgkey: https://pkg.jenkins.io/redhat-stable/jenkins.io-2023.key
     - name: remove any installed git
       yum:
         name: git
