@@ -1,0 +1,1 @@
+/home/public *(rw,async,no_root_squash,insecure)

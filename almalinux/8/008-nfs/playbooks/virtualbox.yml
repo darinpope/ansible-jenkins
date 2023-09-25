@@ -1,0 +1,50 @@
+---
+- name: Install base software on all
+  hosts: all
+  gather_facts: yes
+  become: yes
+  tasks:
+    - name: update hosts
+      lineinfile:
+        path: "/etc/hosts"
+        regexp: ".*\t{{ hostvars[item]['ansible_hostname']}}\t{{ hostvars[item]['ansible_hostname']}}"
+        line: "{{ hostvars[item]['ansible_ssh_host'] }}\t{{ hostvars[item]['ansible_hostname']}}\t{{ hostvars[item]['ansible_hostname']}}"
+        state: present
+        backup: yes
+      with_items: "{{ ansible_play_batch }}"       
+    - name: remove any installed git
+      dnf:
+        name: git
+        state: absent
+      
+- name: Agent installation
+  hosts: agents
+  become: yes
+  tasks:
+    - name: disable firewalld service
+      systemd:
+        name: firewalld
+        state: stopped
+        enabled: false
+    - name: Install Docker and unzip
+      dnf:
+        name: 
+          - nfs-utils
+        state: latest
+    - name: set final ownership to /opt/tools
+      file: 
+        path: "/home/public"
+        state: directory
+        owner: vagrant
+        group: vagrant
+        recurse: yes
+        mode: 0777
+    - name: Create export file
+      copy:
+        dest: "/etc/exports"
+        src: "exports"
+    - name: restart nfs-server service
+      systemd:
+        name: nfs-server
+        state: restarted
+        enabled: true
