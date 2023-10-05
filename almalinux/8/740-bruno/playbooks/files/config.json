@@ -1,0 +1,5 @@
+{
+	"cliPluginsExtraDirs": [
+		"/home/vagrant/.docker/scout"
+	]
+}

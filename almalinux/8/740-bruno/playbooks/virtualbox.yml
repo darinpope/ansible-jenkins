@@ -105,7 +105,7 @@
         permanent: yes
         state: enabled
         immediate: yes
-    - name: Install Docker and unzip
+    - name: Install unzip and tree
       dnf:
         name: 
           - unzip
@@ -119,3 +119,68 @@
       npm:
         name: '@usebruno/cli'
         global: yes
+    - name: remove any installed docker
+      dnf:
+        name:
+          - docker
+          - docker-client
+          - docker-client-latest
+          - docker-common
+          - docker-latest
+          - docker-latest-logrotate
+          - docker-logrotate
+          - docker-engine
+        state: absent
+    - name: docker-ce-stable yum repository
+      yum_repository:
+        name: docker-ce-stable
+        description: Docker CE Stable - $basearch
+        baseurl: https://download.docker.com/linux/centos/8/$basearch/stable
+        enabled: yes
+        gpgcheck: yes
+        gpgkey: https://download.docker.com/linux/centos/gpg
+    - name: Install Docker and unzip
+      dnf:
+        name: 
+          - docker-ce
+          - docker-ce-cli
+          - containerd.io
+          - unzip
+          - tree
+        state: latest
+    - name: add docker group
+      group:
+        name: docker
+        state: present
+    - name: add $USER to docker group
+      user: 
+        name: "{{ ansible_user }}"
+        groups: docker
+        append: yes
+    - name: do a ssh reset in order to reflect the $USER group changes
+      meta: reset_connection
+    - name: start Docker service
+      systemd:
+        name: docker
+        state: restarted
+        enabled: yes
+    - name: create Scout directory
+      file: 
+        path: "/home/vagrant/.docker/scout"
+        state: directory
+        owner: vagrant
+        group: vagrant
+        recurse: yes
+    - name: download Docker Scout
+      unarchive:
+        src: https://github.com/docker/scout-cli/releases/download/v1.0.8/docker-scout_1.0.8_linux_amd64.tar.gz
+        dest: /home/vagrant/.docker/scout
+        remote_src: yes
+    - name: set scout as executable
+      file:
+        dest: /home/vagrant/.docker/scout/docker-scout
+        mode: a+x
+    - name: Create config.json file
+      copy:
+        dest: "/home/vagrant/.docker/config.json"
+        src: "config.json"
