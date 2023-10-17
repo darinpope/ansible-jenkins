@@ -1,8 +1,8 @@
 ---
 - name: Install base software on all
   hosts: all
-  gather_facts: yes
-  become: yes
+  gather_facts: true
+  become: true
   tasks:
     - name: update hosts
       lineinfile:
@@ -34,7 +34,7 @@
       
 - name: Jenkins installation
   hosts: jenkins_controllers
-  become: yes
+  become: true
   tasks:
     - name: enable and start firewalld service
       systemd:
@@ -58,7 +58,7 @@
     - name: Install Jenkins
       dnf:
         name:
-          - jenkins-2.414.2
+          - jenkins-2.414.3
         state: latest
     - name: Create directories for Jenkins
       file:
@@ -91,7 +91,7 @@
 
 - name: Agent installation
   hosts: agents
-  become: yes
+  become: true
   tasks:
     - name: enable and start firewalld service
       systemd:
