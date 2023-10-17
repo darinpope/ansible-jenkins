@@ -1,8 +1,8 @@
 ---
 - name: Install base software on all
   hosts: all
-  gather_facts: yes
-  become: yes
+  gather_facts: true
+  become: true
   tasks:
     - name: update hosts
       lineinfile:
@@ -42,7 +42,7 @@
       
 - name: Jenkins Old installation
   hosts: jenkins_old_controllers
-  become: yes
+  become: true
   tasks:
     - name: enable and start firewalld service
       systemd:
@@ -97,7 +97,7 @@
 
 - name: Jenkins new installation
   hosts: jenkins_new_controllers
-  become: yes
+  become: true
   tasks:
     - name: enable and start firewalld service
       systemd:
