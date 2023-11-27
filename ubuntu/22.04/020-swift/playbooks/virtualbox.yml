@@ -1,0 +1,197 @@
+---
+- name: Install base software on all
+  hosts: all
+  gather_facts: true
+  become: true
+  tasks:
+    - name: update hosts
+      lineinfile:
+        path: "/etc/hosts"
+        regexp: ".*\t{{ hostvars[item]['ansible_hostname']}}\t{{ hostvars[item]['ansible_hostname']}}"
+        line: "{{ hostvars[item]['ansible_ssh_host'] }}\t{{ hostvars[item]['ansible_hostname']}}\t{{ hostvars[item]['ansible_hostname']}}"
+        state: present
+        backup: yes
+      with_items: "{{ ansible_play_batch }}"       
+    - name: add Adoptium apt key
+      ansible.builtin.apt_key:
+        url: https://packages.adoptium.net/artifactory/api/gpg/key/public
+        state: present
+    - name: add Adoptium repository
+      ansible.builtin.apt_repository:
+        repo: deb https://packages.adoptium.net/artifactory/deb focal main
+        state: present
+    - name: Install common software
+      apt:
+        name:
+          - temurin-21-jdk
+          - apt-transport-https 
+          - ca-certificates 
+          - curl 
+          - git
+          - gnupg
+          - gnupg-agent 
+          - software-properties-common
+          - unzip
+          - wget
+        state: latest
+      
+- name: Jenkins installation
+  hosts: jenkins_controllers
+  become: true
+  tasks:
+    - name: Allow everything and enable UFW
+      community.general.ufw:
+        state: enabled
+        policy: deny
+    - name: Allow all access to tcp port 8080
+      community.general.ufw:
+        rule: allow
+        port: '8080'
+        proto: tcp
+    - name: add Jenkins apt key
+      apt_key:
+        url: https://pkg.jenkins.io/debian-stable/jenkins.io-2023.key
+        state: present
+    - name: Jenkins deb repository
+      apt_repository:
+        repo: deb https://pkg.jenkins.io/debian-stable binary/
+        state: present
+    - name: Install Jenkins
+      apt:
+        name:
+          - jenkins=2.426.1
+    - name: Stop Jenkins (autostarts after install)
+      systemd:
+        name: jenkins
+        state: stopped
+    - name: delete JENKINS_HOME directory
+      file:
+        state: absent
+        path: /var/lib/jenkins
+    - name: Create directories for Jenkins
+      file:
+        path: "{{ item }}"
+        state: directory
+        owner: jenkins
+        group: jenkins
+        recurse: yes
+      with_items:
+        - '/var/cache/jenkins/tmp'
+        - '/var/cache/jenkins/heapdumps'
+        - '/var/lib/jenkins'
+    - name: Create directory for systemd override file
+      file:
+        path: "{{ item }}"
+        state: directory
+        owner: root
+        group: root
+        recurse: yes
+      with_items:
+        - '/etc/systemd/system/jenkins.service.d'
+    - name: Create limits file
+      copy:
+        dest: "/etc/systemd/system/jenkins.service.d/override.conf"
+        src: "override.conf"
+    - name: start jenkins service
+      systemd:
+        name: jenkins
+        state: restarted
+        enabled: yes
+
+- name: Agent installation
+  hosts: agents
+  become: true
+  tasks:
+    - name: Allow everything and enable UFW
+      community.general.ufw:
+        state: enabled
+        policy: deny
+    - name: Allow all access to tcp port 22
+      community.general.ufw:
+        rule: allow
+        port: '22'
+        proto: tcp
+    - name: remove any installed docker
+      apt:
+        name:
+          - docker 
+          - docker-engine 
+          - docker.io 
+          - containerd 
+          - runc 
+        state: absent
+    - name: add docker-ce apt key
+      apt_key:
+        url: https://download.docker.com/linux/ubuntu/gpg
+        state: present
+    - name: docker-ce-stable deb repository
+      apt_repository:
+        repo: deb [arch=amd64] https://download.docker.com/linux/ubuntu focal stable
+        state: present
+    - name: deadsnakes deb repository
+      apt_repository:
+        repo: ppa:deadsnakes/ppa
+    - name: Install Docker
+      apt:
+        name: 
+          - docker-ce
+          - docker-ce-cli
+          - containerd.io
+          - binutils
+          - git
+          - gnupg2
+          - libc6-dev
+          - libcurl4-openssl-dev
+          - libedit2
+          - libgcc-9-dev
+          - libpython3.8
+          - libsqlite3-0
+          - libstdc++-9-dev
+          - libxml2-dev
+          - libz3-dev
+          - pkg-config
+          - tzdata
+          - unzip
+          - zlib1g-dev
+        state: latest
+        update_cache: yes
+    - name: add docker group
+      group:
+        name: docker
+        state: present
+    - name: add $USER to docker group
+      user: 
+        name: "{{ ansible_user }}"
+        groups: docker
+        append: yes
+    - name: do a ssh reset in order to reflect the $USER group changes
+      meta: reset_connection
+    - name: start Docker service
+      systemd:
+        name: docker
+        state: restarted   
+        enabled: yes
+    - name: create Swift directory
+      file: 
+        path: "/opt/tools/swift"
+        state: directory
+        owner: vagrant
+        group: vagrant
+        recurse: yes
+    - name: download swift
+      unarchive:
+        src: https://download.swift.org/swift-5.9.1-release/ubuntu2204/swift-5.9.1-RELEASE/swift-5.9.1-RELEASE-ubuntu22.04.tar.gz
+        dest: /opt/tools/swift
+        remote_src: yes
+    - name: setup swift profile
+      copy:
+        dest: /etc/profile.d/swift.sh
+        content: |
+          PATH=/opt/tools/swift/swift-5.9.1-RELEASE-ubuntu22.04/usr/bin:$PATH
+    - name: set final ownership to /opt/tools
+      file: 
+        path: "/opt/tools"
+        state: directory
+        owner: vagrant
+        group: vagrant
+        recurse: yes
