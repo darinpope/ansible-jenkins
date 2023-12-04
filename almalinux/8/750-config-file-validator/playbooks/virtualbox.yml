@@ -158,7 +158,7 @@
         recurse: yes
     - name: install config-file-validator
       unarchive:
-        src: https://github.com/Boeing/config-file-validator/releases/download/v1.5.0/validator-v1.5.0-darwin-amd64.tar.gz
+        src: https://github.com/Boeing/config-file-validator/releases/download/v1.5.0/validator-v1.5.0-linux-amd64.tar.gz
         dest: /opt/tools/config-file-validator
         remote_src: yes
     - name: setup config-file-validator profile
