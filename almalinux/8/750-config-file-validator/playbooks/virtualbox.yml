@@ -166,6 +166,23 @@
         dest: /etc/profile.d/config-file-validator.sh
         content: |
           PATH=/opt/tools/config-file-validator:$PATH
+    - name: create hurl directory
+      file: 
+        path: "/opt/tools/hurl"
+        state: directory
+        owner: vagrant
+        group: vagrant
+        recurse: yes
+    - name: install hurl
+      unarchive:
+        src: https://github.com/Orange-OpenSource/hurl/releases/download/4.1.0/hurl-4.1.0-x86_64-unknown-linux-gnu.tar.gz
+        dest: /opt/tools/hurl
+        remote_src: yes
+    - name: setup hurl profile
+      copy:
+        dest: /etc/profile.d/hurl.sh
+        content: |
+          PATH=/opt/tools/hurl/hurl-4.1.0-x86_64-unknown-linux-gnu:$PATH
     - name: set final ownership to /opt/tools
       file: 
         path: "/opt/tools"
