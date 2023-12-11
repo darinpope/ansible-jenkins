@@ -21,7 +21,7 @@
       yum_repository:
         name: Adoptium
         description: Adoptium
-        baseurl: https://packages.adoptium.net/artifactory/rpm/centos/$releasever/$basearch
+        baseurl: https://packages.adoptium.net/artifactory/rpm/rocky/$releasever/$basearch
         enabled: yes
         gpgcheck: yes
         gpgkey: https://packages.adoptium.net/artifactory/api/gpg/key/public
