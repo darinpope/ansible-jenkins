@@ -72,6 +72,7 @@
       with_items:
         - '/var/cache/jenkins/tmp'
         - '/var/cache/jenkins/heapdumps'
+        - '/var/run/jenkins'
     - name: Create directory for systemd override file
       file:
         path: "{{ item }}"
