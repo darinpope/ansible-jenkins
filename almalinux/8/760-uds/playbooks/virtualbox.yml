@@ -30,6 +30,7 @@
           - temurin-21-jdk
           - git
           - wget
+          - net-tools
         state: latest
       
 - name: Jenkins installation
@@ -37,16 +38,24 @@
   become: true
   tasks:
     - name: enable and start firewalld service
-      systemd:
+      ansible.builtin.systemd_service:
         name: firewalld
         state: started
         enabled: yes
-    - name: permit traffic in default zone on port 8080/tcp
+    - name: permit traffic in default zone for https service
       ansible.posix.firewalld:
-        port: 8080/tcp
-        permanent: yes
+        service: https
+        permanent: true
         state: enabled
-        immediate: yes
+    - name: permit traffic in default zone for http service
+      ansible.posix.firewalld:
+        service: http
+        permanent: true
+        state: enabled
+    - name: Always reload firewalld
+      ansible.builtin.systemd_service:
+        name: firewalld
+        state: reloaded        
     - name: jenkins yum repository
       yum_repository:
         name: jenkins
@@ -86,9 +95,23 @@
       copy:
         dest: "/etc/systemd/system/jenkins.service.d/override.conf"
         src: "override.conf"
+    - name: Rename welcome.conf
+      copy:
+        remote_src: true
+        src: "/etc/httpd/conf.d/welcome.conf"
+        dest: "/etc/httpd/conf.d/welcome.old"
+    - name: Create jenkins.conf file
+      copy:
+        dest: "/etc/httpd/conf.d/jenkins.conf"
+        src: "jenkins.conf"
     - name: start jenkins service
       systemd:
         name: jenkins
+        state: restarted
+        enabled: yes
+    - name: start httpd service
+      systemd:
+        name: httpd
         state: restarted
         enabled: yes
 
