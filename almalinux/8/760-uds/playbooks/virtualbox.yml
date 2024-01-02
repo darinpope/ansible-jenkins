@@ -96,20 +96,19 @@
         dest: "/etc/systemd/system/jenkins.service.d/override.conf"
         src: "override.conf"
     - name: Rename welcome.conf
-      copy:
-        remote_src: true
-        src: "/etc/httpd/conf.d/welcome.conf"
-        dest: "/etc/httpd/conf.d/welcome.old"
+      command: mv /etc/httpd/conf.d/welcome.conf /etc/httpd/conf.d/welcome.old
+    - name: set SELinux for Apache permissions for socket
+      command: chcon -t httpd_sys_rw_content_t /var/run/jenkins/jenkins.socket
     - name: Create jenkins.conf file
       copy:
         dest: "/etc/httpd/conf.d/jenkins.conf"
         src: "jenkins.conf"
-    - name: start jenkins service
+    - name: restart jenkins service
       systemd:
         name: jenkins
         state: restarted
         enabled: yes
-    - name: start httpd service
+    - name: restart httpd service
       systemd:
         name: httpd
         state: restarted
