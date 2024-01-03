@@ -40,7 +40,7 @@
     - name: enable and start firewalld service
       ansible.builtin.systemd_service:
         name: firewalld
-        state: started
+        state: stopped
         enabled: yes
     - name: jenkins yum repository
       yum_repository:
