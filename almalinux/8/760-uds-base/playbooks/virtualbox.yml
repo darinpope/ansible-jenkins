@@ -31,6 +31,8 @@
           - git
           - wget
           - net-tools
+          - setools-console
+          - policycoreutils-python-utils
         state: latest
       
 - name: Jenkins installation
