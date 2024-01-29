@@ -27,7 +27,7 @@
     - name: Install temurin and git
       dnf:
         name:
-          - temurin-21-jdk
+          - temurin-17-jdk
           - git
           - wget
         state: latest
