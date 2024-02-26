@@ -14,12 +14,12 @@ Vagrant.configure(2) do |config|
   config.vm.define "agent1" do |agent1|
     agent1.vm.network "private_network", ip: "192.168.56.15"
     agent1.vm.network "public_network", ip: "192.168.1.240", bridge: "en3: Thunderbolt Ethernet"
-    agent1.vm.disk :disk, size: "40GB", primary: true
     agent1.vm.hostname = "agent1"
     agent1.vm.provider "virtualbox" do |vb|
       vb.cpus = 1
       vb.memory = 1024
     end
+    #agent1.vm.disk :disk, size: "40GB", primary: true
     #agent1.vm.provision "shell", inline: <<-SHELL
     #  printf "\nDisk free space before...\n"
     #  df -lhT /
