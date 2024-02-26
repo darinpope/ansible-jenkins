@@ -55,7 +55,7 @@
     - name: Install Jenkins
       dnf:
         name:
-          - jenkins-2.426.3
+          - jenkins-2.440.1
           - httpd
           - httpd-tools
         state: latest
