@@ -1,8 +1,8 @@
 ---
 - name: Install base software on all
   hosts: all
-  gather_facts: yes
-  become: yes
+  gather_facts: true
+  become: true
   tasks:
     - name: update hosts
       lineinfile:
@@ -34,7 +34,7 @@
       
 - name: Jenkins installation
   hosts: jenkins_controllers
-  become: yes
+  become: true
   tasks:
     - name: enable and start firewalld service
       systemd:
@@ -54,11 +54,11 @@
         baseurl: http://pkg.jenkins.io/redhat-stable
         enabled: yes
         gpgcheck: yes
-        gpgkey: https://pkg.jenkins.io/redhat-stable/jenkins.io.key
+        gpgkey: https://pkg.jenkins.io/redhat-stable/jenkins.io-2023.key
     - name: Install Jenkins
       dnf:
         name:
-          - jenkins-2.387.1
+          - jenkins-2.440.1
         state: latest
     - name: Create directories for Jenkins
       file:
@@ -91,7 +91,7 @@
 
 - name: Agent installation
   hosts: agents
-  become: yes
+  become: true
   tasks:
     - name: enable and start firewalld service
       systemd:
