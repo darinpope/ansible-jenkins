@@ -24,17 +24,17 @@
       dnf:
         name: git
         state: absent
-    - name: update sshd_config to allow for password logins
-      lineinfile:
-        path: "/etc/ssh/sshd_config"
-        regexp: ".*PasswordAuthentication no.*"
-        line: "PasswordAuthentication yes"
-        state: present
-    - name: restart sshd service
-      systemd:
-        name: sshd
-        state: restarted
-        enabled: yes    
+    #- name: update sshd_config to allow for password logins
+    #  lineinfile:
+    #    path: "/etc/ssh/sshd_config"
+    #    search_string: 'PasswordAuthentication no'
+    #    line: "PasswordAuthentication yes"
+    #    state: present
+    #- name: restart sshd service
+    #  systemd:
+    #    name: sshd
+    #    state: restarted
+    #    enabled: yes    
     - name: Install temurin and git
       dnf:
         name:
