@@ -40,6 +40,7 @@
         name:
           - temurin-17-jdk
           - git
+          - tree
         state: latest
       
 - name: Jenkins installation
@@ -134,14 +135,12 @@
         enabled: yes
         gpgcheck: yes
         gpgkey: https://download.docker.com/linux/centos/gpg
-    - name: Install Docker and unzip
+    - name: Install Docker
       dnf:
         name: 
           - docker-ce
           - docker-ce-cli
           - containerd.io
-          - unzip
-          - tree
         state: latest
     - name: add docker group
       group:
