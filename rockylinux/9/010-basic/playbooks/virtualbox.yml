@@ -40,7 +40,6 @@
         name:
           - temurin-17-jdk
           - git
-          - wget
         state: latest
       
 - name: Jenkins installation
