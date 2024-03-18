@@ -136,25 +136,25 @@
           - squid
           - httpd-tools
         state: latest
-    - name: Copy over password file
-      copy:
-        dest: "/etc/squid/passwd"
-        src: "squid-passwd"
-    - name: update squid.conf - 3
-      lineinfile:
-        path: "/etc/squid/squid.conf"
-        line: "http_access allow ncsa_users"
-        insertbefore: BOF
-    - name: update squid.conf - 2
-      lineinfile:
-        path: "/etc/squid/squid.conf"
-        line: "acl ncsa_users proxy_auth REQUIRED"
-        insertbefore: BOF
-    - name: update squid.conf - 1
-      lineinfile:
-        path: "/etc/squid/squid.conf"
-        line: "auth_param basic program /usr/lib64/squid/basic_ncsa_auth /etc/squid/passwd"
-        insertbefore: BOF
+    #- name: Copy over password file
+    #  copy:
+    #    dest: "/etc/squid/passwd"
+    #    src: "squid-passwd"
+    #- name: update squid.conf - 3
+    #  lineinfile:
+    #    path: "/etc/squid/squid.conf"
+    #    line: "http_access allow ncsa_users"
+    #    insertbefore: BOF
+    #- name: update squid.conf - 2
+    #  lineinfile:
+    #    path: "/etc/squid/squid.conf"
+    #    line: "acl ncsa_users proxy_auth REQUIRED"
+    #    insertbefore: BOF
+    #- name: update squid.conf - 1
+    #  lineinfile:
+    #    path: "/etc/squid/squid.conf"
+    #    line: "auth_param basic program /usr/lib64/squid/basic_ncsa_auth /etc/squid/passwd"
+    #    insertbefore: BOF
     - name: start squid service
       systemd:
         name: squid
