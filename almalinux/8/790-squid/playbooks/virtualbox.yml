@@ -48,7 +48,9 @@
         state: enabled
         immediate: yes
     - name: block access to updates.jenkins.io
-      command: firewall-cmd --direct --add-rule ipv4 filter OUTPUT 0 -d 52.202.51.185/32  -j REJECT
+      command: firewall-cmd --permanent --direct --add-rule ipv4 filter OUTPUT 0 -d 52.202.51.185/32  -j REJECT
+    - name: reload the firewall
+      command: firewall-cmd --reload
     - name: jenkins yum repository
       yum_repository:
         name: jenkins
