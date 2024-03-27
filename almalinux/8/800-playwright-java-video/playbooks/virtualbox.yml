@@ -112,4 +112,7 @@
           - pango
           - atk
           - cups
+          - gtk3
+          - libdrm
+          - libgbm
         state: latest
