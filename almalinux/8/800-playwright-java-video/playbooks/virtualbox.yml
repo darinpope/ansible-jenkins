@@ -104,15 +104,35 @@
         permanent: yes
         state: enabled
         immediate: yes
-    - name: Install dependencies to run browsers
+    - name: install NodeJS
       dnf:
-        name: 
-          - nss
-          - cairo
-          - pango
-          - atk
-          - cups
-          - gtk3
-          - libdrm
-          - libgbm
-        state: latest
+        name: '@nodejs:20/common'
+        state: present
+    - name: install appium CLI
+      npm:
+        name: appium
+        global: yes
+    - name: create jmeter directory
+      file: 
+        path: "/opt/tools/jmeter"
+        state: directory
+        owner: vagrant
+        group: vagrant
+        recurse: yes
+    - name: download JMeter 5.6.3
+      unarchive:
+        src: https://dlcdn.apache.org//jmeter/binaries/apache-jmeter-5.6.3.tgz
+        dest: /opt/tools/jmeter
+        remote_src: yes
+    - name: setup pack profile
+      copy:
+        dest: /etc/profile.d/jmeter.sh
+        content: |
+          PATH=/opt/tools/jmeter:$PATH
+    - name: set final ownership to /opt/tools
+      file: 
+        path: "/opt/tools"
+        state: directory
+        owner: vagrant
+        group: vagrant
+        recurse: yes
