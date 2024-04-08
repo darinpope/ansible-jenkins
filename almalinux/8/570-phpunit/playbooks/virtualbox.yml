@@ -123,13 +123,23 @@
         name: 
           - php
         state: latest
-    - name: Install PHPUnit
-      dnf:
-        name: 
-          - phpunit11
-        enablerepo:
-          - remi
-        state: latest
+    - name: create phpunit directory
+      file: 
+        path: "/opt/tools/phpunit"
+        state: directory
+        owner: vagrant
+        group: vagrant
+        recurse: yes
+    - name: download PHPUnit
+      get_url:
+        url: https://phar.phpunit.de/phpunit-11.phar
+        dest: /opt/tools/phpunit/phpunit
+        mode: '0755'
+    - name: setup PHPUnit profile
+      copy:
+        dest: /etc/profile.d/phpunit.sh
+        content: |
+          PATH=/opt/tools/phpunit:$PATH
     - name: set final ownership to /opt/tools
       file: 
         path: "/opt/tools"
