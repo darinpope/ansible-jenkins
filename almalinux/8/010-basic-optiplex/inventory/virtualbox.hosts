@@ -1,0 +1,8 @@
+[all:vars]
+ansible_ssh_common_args='-o StrictHostKeyChecking=no'
+
+[jenkins_controllers]
+jenkins ansible_ssh_host=192.168.1.242 ansible_ssh_port=22
+
+[agents]
+agent1 ansible_ssh_host=192.168.1.244 ansible_ssh_port=22
