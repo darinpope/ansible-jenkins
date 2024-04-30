@@ -105,6 +105,13 @@
         permanent: yes
         state: enabled
         immediate: yes
+    - name: install make, gcc and python3
+      dnf:
+        name:
+          - make
+          - gcc
+          - python3
+        state: latest
     - name: install NodeJS
       dnf:
         name: '@nodejs:20/common'
