@@ -105,21 +105,23 @@
         permanent: yes
         state: enabled
         immediate: yes
-    - name: install make, gcc and python3
-      dnf:
-        name:
-          - make
-          - gcc
-          - python3
-        state: latest
-    - name: install NodeJS
-      dnf:
-        name: '@nodejs:20/common'
-        state: present
-    - name: install promptfoo CLI
-      npm:
-        name: promptfoo
-        global: yes
+    - name: create kit directory
+      file: 
+        path: "/opt/tools/kit"
+        state: directory
+        owner: vagrant
+        group: vagrant
+        recurse: yes
+    - name: install kit
+      unarchive:
+        src: https://github.com/jozu-ai/kitops/releases/download/v0.2.0/kitops-linux-x86_64.tar.gz
+        dest: /opt/tools/kit
+        remote_src: yes
+    - name: setup kit profile
+      copy:
+        dest: /etc/profile.d/kit.sh
+        content: |
+          PATH=/opt/tools/kit:$PATH
     - name: set final ownership to /opt/tools
       file: 
         path: "/opt/tools"
