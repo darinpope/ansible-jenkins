@@ -27,7 +27,7 @@
     - name: Install temurin and git
       dnf:
         name:
-          - temurin-17-jdk
+          - temurin-21-jdk
           - git
           - wget
         state: latest
@@ -58,7 +58,7 @@
     - name: Install Jenkins
       dnf:
         name:
-          - jenkins-2.452.3
+          - jenkins-2.479.1
         state: latest
     - name: Create directories for Jenkins
       file:
