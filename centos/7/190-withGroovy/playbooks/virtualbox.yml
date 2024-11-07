@@ -1,8 +1,8 @@
 ---
 - name: Install base software on all
   hosts: all
-  gather_facts: yes
-  become: yes
+  gather_facts: true
+  become: true
   tasks:
     - name: update hosts
       lineinfile:
@@ -10,23 +10,23 @@
         regexp: ".*\t{{ hostvars[item]['ansible_hostname']}}\t{{ hostvars[item]['ansible_hostname']}}"
         line: "{{ hostvars[item]['ansible_ssh_host'] }}\t{{ hostvars[item]['ansible_hostname']}}\t{{ hostvars[item]['ansible_hostname']}}"
         state: present
-        backup: yes
+        backup: true
       with_items: "{{ ansible_play_batch }}"       
     - name: AdoptOpenJDK yum repository
       yum_repository:
         name: AdoptOpenJDK
         description: AdoptOpenJDK
         baseurl: http://adoptopenjdk.jfrog.io/adoptopenjdk/rpm/centos/$releasever/$basearch
-        enabled: yes
-        gpgcheck: yes
+        enabled: true
+        gpgcheck: true
         gpgkey: https://adoptopenjdk.jfrog.io/adoptopenjdk/api/gpg/key/public
     - name: Endpoint yum repository
       yum_repository:
         name: endpoint
         description: End Point repository
         baseurl: https://packages.endpointdev.com/rhel/$releasever/os/$basearch/
-        enabled: yes
-        gpgcheck: yes
+        enabled: true
+        gpgcheck: true
         gpgkey: https://packages.endpointdev.com/endpoint-rpmsign-7.pub
     - name: remove any installed git
       yum:
@@ -43,26 +43,26 @@
       
 - name: Jenkins installation
   hosts: jenkins_controllers
-  become: yes
+  become: true
   tasks:
     - name: enable and start firewalld service
       systemd:
         name: firewalld
         state: started
-        enabled: yes
+        enabled: true
     - name: permit traffic in default zone on port 8080/tcp
       ansible.posix.firewalld:
         port: 8080/tcp
-        permanent: yes
+        permanent: true
         state: enabled
-        immediate: yes
+        immediate: true
     - name: jenkins yum repository
       yum_repository:
         name: jenkins
         description: Jenkins-stable
         baseurl: http://pkg.jenkins.io/redhat-stable
-        enabled: yes
-        gpgcheck: yes
+        enabled: true
+        gpgcheck: true
         gpgkey: https://pkg.jenkins.io/redhat-stable/jenkins.io.key
     - name: Install JDK and Jenkins
       yum:
@@ -75,7 +75,7 @@
         state: directory
         owner: jenkins
         group: jenkins
-        recurse: yes
+        recurse: true
       with_items:
         - '/var/cache/jenkins/tmp'
         - '/var/cache/jenkins/heapdumps'
@@ -102,59 +102,59 @@
 
 - name: Agent installation
   hosts: agents
-  become: yes
+  become: true
   tasks:
     - name: enable and start firewalld service
       systemd:
         name: firewalld
         state: started
-        enabled: yes
+        enabled: true
     - name: permit traffic in default zone on port 22/tcp
       ansible.posix.firewalld:
         port: 22/tcp
-        permanent: yes
+        permanent: true
         state: enabled
-        immediate: yes
+        immediate: true
     - name: create Groovy directory
       file: 
         path: "/opt/tools/groovy"
         state: directory
         owner: vagrant
         group: vagrant
-        recurse: yes
+        recurse: true
     - name: download Groovy 2.5.14
       unarchive:
         src: https://groovy.jfrog.io/artifactory/dist-release-local/groovy-zips/apache-groovy-binary-2.5.14.zip
         dest: /opt/tools/groovy
-        remote_src: yes
+        remote_src: true
     - name: create Maven directory
       file: 
         path: "/opt/tools/maven"
         state: directory
         owner: vagrant
         group: vagrant
-        recurse: yes
+        recurse: true
     - name: download Maven 3.6.3
       unarchive:
         src: https://archive.apache.org/dist/maven/maven-3/3.6.3/binaries/apache-maven-3.6.3-bin.zip
         dest: /opt/tools/maven
-        remote_src: yes
+        remote_src: true
     - name: create JDK directory
       file: 
         path: "/opt/tools/jdk"
         state: directory
         owner: vagrant
         group: vagrant
-        recurse: yes
+        recurse: true
     - name: download AdoptOpenJDK 11.0.11
       unarchive:
         src: https://github.com/AdoptOpenJDK/openjdk11-binaries/releases/download/jdk-11.0.11%2B9/OpenJDK11U-jdk_x64_linux_hotspot_11.0.11_9.tar.gz
         dest: /opt/tools/jdk
-        remote_src: yes
+        remote_src: true
     - name: set final ownership to /opt/tools
       file: 
         path: "/opt/tools"
         state: directory
         owner: vagrant
         group: vagrant
-        recurse: yes
+        recurse: true

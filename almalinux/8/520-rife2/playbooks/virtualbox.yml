@@ -1,8 +1,8 @@
 ---
 - name: Install base software on all
   hosts: all
-  gather_facts: yes
-  become: yes
+  gather_facts: true
+  become: true
   tasks:
     - name: update hosts
       lineinfile:
@@ -10,15 +10,15 @@
         regexp: ".*\t{{ hostvars[item]['ansible_hostname']}}\t{{ hostvars[item]['ansible_hostname']}}"
         line: "{{ hostvars[item]['ansible_ssh_host'] }}\t{{ hostvars[item]['ansible_hostname']}}\t{{ hostvars[item]['ansible_hostname']}}"
         state: present
-        backup: yes
+        backup: true
       with_items: "{{ ansible_play_batch }}"       
     - name: Adoptium yum repository
       yum_repository:
         name: Adoptium
         description: Adoptium
         baseurl: https://packages.adoptium.net/artifactory/rpm/rocky/$releasever/$basearch
-        enabled: yes
-        gpgcheck: yes
+        enabled: true
+        gpgcheck: true
         gpgkey: https://packages.adoptium.net/artifactory/api/gpg/key/public
     - name: remove any installed git
       yum:
@@ -36,37 +36,37 @@
       
 - name: Jenkins installation
   hosts: jenkins_controllers
-  become: yes
+  become: true
   tasks:
     - name: enable and start firewalld service
       systemd:
         name: firewalld
         state: started
-        enabled: yes
+        enabled: true
     - name: permit traffic in default zone on port 8080/tcp
       ansible.posix.firewalld:
         port: 8080/tcp
-        permanent: yes
+        permanent: true
         state: enabled
-        immediate: yes
+        immediate: true
     - name: permit traffic in default zone on port 50000/tcp
       ansible.posix.firewalld:
         port: 50000/tcp
-        permanent: yes
+        permanent: true
         state: enabled
-        immediate: yes
+        immediate: true
     - name: jenkins yum repository
       yum_repository:
         name: jenkins
         description: Jenkins-stable
         baseurl: http://pkg.jenkins.io/redhat-stable
-        enabled: yes
-        gpgcheck: yes
+        enabled: true
+        gpgcheck: true
         gpgkey: https://pkg.jenkins.io/redhat-stable/jenkins.io.key
     - name: Install Jenkins
       yum:
         name:
-          - jenkins-2.387.1
+          - jenkins-2.479.1
         state: latest
     - name: Create directories for Jenkins
       file:
@@ -74,7 +74,7 @@
         state: directory
         owner: jenkins
         group: jenkins
-        recurse: yes
+        recurse: true
       with_items:
         - '/var/cache/jenkins/tmp'
         - '/var/cache/jenkins/heapdumps'
@@ -84,7 +84,7 @@
         state: directory
         owner: root
         group: root
-        recurse: yes
+        recurse: true
       with_items:
         - '/etc/systemd/system/jenkins.service.d'
     - name: Create limits file
@@ -98,19 +98,19 @@
 
 - name: Agent installation
   hosts: agents
-  become: yes
+  become: true
   tasks:
     - name: enable and start firewalld service
       systemd:
         name: firewalld
         state: started
-        enabled: yes
+        enabled: true
     - name: permit traffic in default zone on port 22/tcp
       ansible.posix.firewalld:
         port: 22/tcp
-        permanent: yes
+        permanent: true
         state: enabled
-        immediate: yes
+        immediate: true
     - name: remove any installed docker
       yum:
         name:
@@ -128,8 +128,8 @@
         name: docker-ce-stable
         description: Docker CE Stable - $basearch
         baseurl: https://download.docker.com/linux/centos/8/$basearch/stable
-        enabled: yes
-        gpgcheck: yes
+        enabled: true
+        gpgcheck: true
         gpgkey: https://download.docker.com/linux/centos/gpg
     - name: Install Docker and unzip
       yum:
@@ -150,7 +150,7 @@
       user: 
         name: "{{ ansible_user }}"
         groups: docker
-        append: yes
+        append: true
     - name: do a ssh reset in order to reflect the $USER group changes
       meta: reset_connection
     - name: start Docker service
@@ -163,12 +163,12 @@
         state: directory
         owner: vagrant
         group: vagrant
-        recurse: yes
+        recurse: true
     - name: download flyctl
       unarchive:
         src: https://github.com/superfly/flyctl/releases/download/v0.0.498/flyctl_0.0.498_Linux_x86_64.tar.gz
         dest: /opt/tools/fly
-        remote_src: yes
+        remote_src: true
     - name: setup fly profile
       copy:
         dest: /etc/profile.d/fly.sh
@@ -180,12 +180,12 @@
         state: directory
         owner: vagrant
         group: vagrant
-        recurse: yes
+        recurse: true
     - name: download Trivy
       unarchive:
         src: https://github.com/aquasecurity/trivy/releases/download/v0.38.3/trivy_0.38.3_Linux-64bit.tar.gz
         dest: /opt/tools/trivy
-        remote_src: yes
+        remote_src: true
     - name: setup Trivy profile
       copy:
         dest: /etc/profile.d/trivy.sh
@@ -197,12 +197,12 @@
         state: directory
         owner: vagrant
         group: vagrant
-        recurse: yes
+        recurse: true
     - name: download Grype
       unarchive:
         src: https://github.com/anchore/grype/releases/download/v0.59.1/grype_0.59.1_linux_amd64.tar.gz
         dest: /opt/tools/grype
-        remote_src: yes
+        remote_src: true
     - name: setup Grype profile
       copy:
         dest: /etc/profile.d/grype.sh
@@ -214,4 +214,4 @@
         state: directory
         owner: vagrant
         group: vagrant
-        recurse: yes
+        recurse: true

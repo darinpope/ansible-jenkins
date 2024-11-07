@@ -1,8 +1,8 @@
 ---
 - name: Install base software on all
   hosts: all
-  gather_facts: yes
-  become: yes
+  gather_facts: true
+  become: true
   tasks:
     - name: update hosts
       lineinfile:
@@ -10,7 +10,7 @@
         regexp: ".*\t{{ hostvars[item]['ansible_hostname']}}\t{{ hostvars[item]['ansible_hostname']}}"
         line: "{{ hostvars[item]['ansible_ssh_host'] }}\t{{ hostvars[item]['ansible_hostname']}}\t{{ hostvars[item]['ansible_hostname']}}"
         state: present
-        backup: yes
+        backup: true
       with_items: "{{ ansible_play_batch }}"       
     - name: remove any installed git
       dnf:
@@ -19,7 +19,7 @@
       
 - name: Agent installation
   hosts: agents
-  become: yes
+  become: true
   tasks:
     - name: disable firewalld service
       systemd:
@@ -37,7 +37,7 @@
         state: directory
         owner: vagrant
         group: vagrant
-        recurse: yes
+        recurse: true
         mode: 0777
     - name: Create export file
       copy:

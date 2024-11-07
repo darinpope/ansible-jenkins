@@ -1,8 +1,8 @@
 ---
 - name: Install base software on all
   hosts: all
-  gather_facts: yes
-  become: yes
+  gather_facts: true
+  become: true
   tasks:
     - name: update hosts
       lineinfile:
@@ -10,23 +10,23 @@
         regexp: ".*\t{{ hostvars[item]['ansible_hostname']}}\t{{ hostvars[item]['ansible_hostname']}}"
         line: "{{ hostvars[item]['ansible_ssh_host'] }}\t{{ hostvars[item]['ansible_hostname']}}\t{{ hostvars[item]['ansible_hostname']}}"
         state: present
-        backup: yes
+        backup: true
       with_items: "{{ ansible_play_batch }}"       
     - name: Adoptium yum repository
       yum_repository:
         name: Adoptium
         description: Adoptium
         baseurl: https://packages.adoptium.net/artifactory/rpm/rocky/$releasever/$basearch
-        enabled: yes
-        gpgcheck: yes
+        enabled: true
+        gpgcheck: true
         gpgkey: https://packages.adoptium.net/artifactory/api/gpg/key/public
     - name: Endpoint yum repository
       yum_repository:
         name: endpoint
         description: End Point repository
         baseurl: https://packages.endpointdev.com/rhel/$releasever/os/$basearch/
-        enabled: yes
-        gpgcheck: yes
+        enabled: true
+        gpgcheck: true
         gpgkey: https://packages.endpointdev.com/endpoint-rpmsign-7.pub
     - name: remove any installed git
       yum:
@@ -43,26 +43,26 @@
       
 - name: Jenkins installation
   hosts: jenkins_controllers
-  become: yes
+  become: true
   tasks:
     - name: enable and start firewalld service
       systemd:
         name: firewalld
         state: started
-        enabled: yes
+        enabled: true
     - name: permit traffic in default zone on port 8080/tcp
       ansible.posix.firewalld:
         port: 8080/tcp
-        permanent: yes
+        permanent: true
         state: enabled
-        immediate: yes
+        immediate: true
     - name: jenkins yum repository
       yum_repository:
         name: jenkins
         description: Jenkins-stable
         baseurl: http://pkg.jenkins.io/redhat-stable
-        enabled: yes
-        gpgcheck: yes
+        enabled: true
+        gpgcheck: true
         gpgkey: https://pkg.jenkins.io/redhat-stable/jenkins.io.key
     - name: Install JDK and Jenkins
       yum:
@@ -75,7 +75,7 @@
         state: directory
         owner: jenkins
         group: jenkins
-        recurse: yes
+        recurse: true
       with_items:
         - '/var/cache/jenkins/tmp'
         - '/var/cache/jenkins/heapdumps'
@@ -102,26 +102,26 @@
 
 - name: Agent installation
   hosts: agents
-  become: yes
+  become: true
   tasks:
     - name: enable and start firewalld service
       systemd:
         name: firewalld
         state: started
-        enabled: yes
+        enabled: true
     - name: permit traffic in default zone on port 22/tcp
       ansible.posix.firewalld:
         port: 22/tcp
-        permanent: yes
+        permanent: true
         state: enabled
-        immediate: yes
+        immediate: true
     - name: MariaDB yum repository
       yum_repository:
         name: MariaDB
         description: MariaDB
         baseurl: http://yum.mariadb.org/10.6/centos$releasever-amd64
-        enabled: yes
-        gpgcheck: yes
+        enabled: true
+        gpgcheck: true
         gpgkey: https://yum.mariadb.org/RPM-GPG-KEY-MariaDB
     - name: remove any installed docker
       yum:
@@ -140,8 +140,8 @@
         name: docker-ce-stable
         description: Docker CE Stable - $basearch
         baseurl: https://download.docker.com/linux/centos/7/$basearch/stable
-        enabled: yes
-        gpgcheck: yes
+        enabled: true
+        gpgcheck: true
         gpgkey: https://download.docker.com/linux/centos/gpg
     - name: Install Docker and unzip
       yum:
@@ -159,7 +159,7 @@
       user: 
         name: "{{ ansible_user }}"
         groups: docker
-        append: yes
+        append: true
     - name: do a ssh reset in order to reflect the $USER group changes
       meta: reset_connection
     - name: start Docker service
@@ -178,12 +178,12 @@
         state: directory
         owner: vagrant
         group: vagrant
-        recurse: yes
+        recurse: true
     - name: download Heroku
       unarchive:
         src: https://cli-assets.heroku.com/heroku-linux-x64.tar.gz
         dest: /opt/tools/heroku
-        remote_src: yes
+        remote_src: true
     - name: setup Heroku profile
       copy:
         dest: /etc/profile.d/heroku.sh
@@ -195,36 +195,36 @@
         state: directory
         owner: vagrant
         group: vagrant
-        recurse: yes
+        recurse: true
 
 - name: MariaDB installation
   hosts: mariadbs
-  become: yes
+  become: true
   tasks:
     - name: enable and start firewalld service
       systemd:
         name: firewalld
         state: started
-        enabled: yes
+        enabled: true
     - name: permit traffic in default zone on port 22/tcp
       ansible.posix.firewalld:
         port: 22/tcp
-        permanent: yes
+        permanent: true
         state: enabled
-        immediate: yes
+        immediate: true
     - name: permit traffic in default zone on port 3306/tcp
       ansible.posix.firewalld:
         port: 3306/tcp
-        permanent: yes
+        permanent: true
         state: enabled
-        immediate: yes
+        immediate: true
     - name: MariaDB yum repository
       yum_repository:
         name: MariaDB
         description: MariaDB
         baseurl: http://yum.mariadb.org/10.6/centos$releasever-amd64
-        enabled: yes
-        gpgcheck: yes
+        enabled: true
+        gpgcheck: true
         gpgkey: https://yum.mariadb.org/RPM-GPG-KEY-MariaDB
     - name: Install MariaDB server
       yum:

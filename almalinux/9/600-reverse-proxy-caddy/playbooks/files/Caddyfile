@@ -1,0 +1,6 @@
+ctest.planetpope.com {
+	tls /etc/pki/tls/certs/fullchain.pem /etc/pki/tls/private/privkey.pem
+	handle /* {
+		reverse_proxy localhost:8080
+	}
+}

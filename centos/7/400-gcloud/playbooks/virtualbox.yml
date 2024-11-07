@@ -1,8 +1,8 @@
 ---
 - name: Install base software on all
   hosts: all
-  gather_facts: yes
-  become: yes
+  gather_facts: true
+  become: true
   tasks:
     - name: update hosts
       lineinfile:
@@ -10,23 +10,23 @@
         regexp: ".*\t{{ hostvars[item]['ansible_hostname']}}\t{{ hostvars[item]['ansible_hostname']}}"
         line: "{{ hostvars[item]['ansible_ssh_host'] }}\t{{ hostvars[item]['ansible_hostname']}}\t{{ hostvars[item]['ansible_hostname']}}"
         state: present
-        backup: yes
+        backup: true
       with_items: "{{ ansible_play_batch }}"       
     - name: Adoptium yum repository
       yum_repository:
         name: Adoptium
         description: Adoptium
         baseurl: https://packages.adoptium.net/artifactory/rpm/rocky/$releasever/$basearch
-        enabled: yes
-        gpgcheck: yes
+        enabled: true
+        gpgcheck: true
         gpgkey: https://packages.adoptium.net/artifactory/api/gpg/key/public
     - name: Endpoint yum repository
       yum_repository:
         name: endpoint
         description: End Point repository
         baseurl: https://packages.endpointdev.com/rhel/$releasever/os/$basearch/
-        enabled: yes
-        gpgcheck: yes
+        enabled: true
+        gpgcheck: true
         gpgkey: https://packages.endpointdev.com/endpoint-rpmsign-7.pub
     - name: remove any installed git
       yum:
@@ -43,26 +43,26 @@
       
 - name: Jenkins installation
   hosts: jenkins_controllers
-  become: yes
+  become: true
   tasks:
     - name: enable and start firewalld service
       systemd:
         name: firewalld
         state: started
-        enabled: yes
+        enabled: true
     - name: permit traffic in default zone on port 8080/tcp
       ansible.posix.firewalld:
         port: 8080/tcp
-        permanent: yes
+        permanent: true
         state: enabled
-        immediate: yes
+        immediate: true
     - name: jenkins yum repository
       yum_repository:
         name: jenkins
         description: Jenkins-stable
         baseurl: http://pkg.jenkins.io/redhat-stable
-        enabled: yes
-        gpgcheck: yes
+        enabled: true
+        gpgcheck: true
         gpgkey: https://pkg.jenkins.io/redhat-stable/jenkins.io.key
     - name: Install Jenkins
       yum:
@@ -75,7 +75,7 @@
         state: directory
         owner: jenkins
         group: jenkins
-        recurse: yes
+        recurse: true
       with_items:
         - '/var/cache/jenkins/tmp'
         - '/var/cache/jenkins/heapdumps'
@@ -85,7 +85,7 @@
         state: directory
         owner: root
         group: root
-        recurse: yes
+        recurse: true
       with_items:
         - '/etc/systemd/system/jenkins.service.d'
     - name: Create limits file
@@ -96,30 +96,30 @@
       systemd:
         name: jenkins
         state: restarted
-        enabled: yes
+        enabled: true
 
 - name: Agent installation
   hosts: agents
-  become: yes
+  become: true
   tasks:
     - name: enable and start firewalld service
       systemd:
         name: firewalld
         state: started
-        enabled: yes
+        enabled: true
     - name: permit traffic in default zone on port 22/tcp
       ansible.posix.firewalld:
         port: 22/tcp
-        permanent: yes
+        permanent: true
         state: enabled
-        immediate: yes
+        immediate: true
     - name: Google Cloud CLI yum repository
       yum_repository:
         name: google-cloud-cli
         description: Google Cloud CLI
         baseurl: https://packages.cloud.google.com/yum/repos/cloud-sdk-el7-x86_64
-        enabled: yes
-        gpgcheck: yes
+        enabled: true
+        gpgcheck: true
         repo_gpgcheck: no
         gpgkey: 
           - https://packages.cloud.google.com/yum/doc/yum-key.gpg

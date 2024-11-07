@@ -1,8 +1,8 @@
 ---
 - name: Install base software on all
   hosts: all
-  gather_facts: yes
-  become: yes
+  gather_facts: true
+  become: true
   tasks:
     - name: update hosts
       lineinfile:
@@ -10,20 +10,20 @@
         regexp: ".*\t{{ hostvars[item]['ansible_hostname']}}\t{{ hostvars[item]['ansible_hostname']}}"
         line: "{{ hostvars[item]['ansible_ssh_host'] }}\t{{ hostvars[item]['ansible_hostname']}}\t{{ hostvars[item]['ansible_hostname']}}"
         state: present
-        backup: yes
+        backup: true
       with_items: "{{ ansible_play_batch }}"       
       
 - name: Jenkins installation
   hosts: jenkins_controllers
-  become: yes
+  become: true
   tasks:
     - name: Endpoint yum repository
       yum_repository:
         name: endpoint
         description: End Point repository
         baseurl: https://packages.endpointdev.com/rhel/$releasever/os/$basearch/
-        enabled: yes
-        gpgcheck: yes
+        enabled: true
+        gpgcheck: true
         gpgkey: https://packages.endpointdev.com/endpoint-rpmsign-7.pub
     - name: remove any installed git
       yum:
@@ -40,19 +40,19 @@
       systemd:
         name: firewalld
         state: started
-        enabled: yes
+        enabled: true
     - name: permit traffic in default zone on port 8080/tcp
       ansible.posix.firewalld:
         port: 8080/tcp
-        permanent: yes
+        permanent: true
         state: enabled
-        immediate: yes
+        immediate: true
     - name: permit traffic in default zone on port 8443/tcp
       ansible.posix.firewalld:
         port: 8443/tcp
-        permanent: yes
+        permanent: true
         state: enabled
-        immediate: yes
+        immediate: true
     - name: remove any installed docker
       yum:
         name:
@@ -70,8 +70,8 @@
         name: docker-ce-stable
         description: Docker CE Stable - $basearch
         baseurl: https://download.docker.com/linux/centos/7/$basearch/stable
-        enabled: yes
-        gpgcheck: yes
+        enabled: true
+        gpgcheck: true
         gpgkey: https://download.docker.com/linux/centos/gpg
     - name: Install Docker and unzip
       yum:
@@ -88,7 +88,7 @@
       user: 
         name: "{{ ansible_user }}"
         groups: docker
-        append: yes
+        append: true
     - name: do a ssh reset in order to reflect the $USER group changes
       meta: reset_connection
     - name: start Docker service

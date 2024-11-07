@@ -1,8 +1,8 @@
 ---
 - name: Install base software on all
   hosts: all
-  gather_facts: yes
-  become: yes
+  gather_facts: true
+  become: true
   tasks:
     - name: update hosts
       lineinfile:
@@ -10,15 +10,15 @@
         regexp: ".*\t{{ hostvars[item]['ansible_hostname']}}\t{{ hostvars[item]['ansible_hostname']}}"
         line: "{{ hostvars[item]['ansible_ssh_host'] }}\t{{ hostvars[item]['ansible_hostname']}}\t{{ hostvars[item]['ansible_hostname']}}"
         state: present
-        backup: yes
+        backup: true
       with_items: "{{ ansible_play_batch }}"       
     - name: AdoptOpenJDK yum repository
       yum_repository:
         name: AdoptOpenJDK
         description: AdoptOpenJDK
         baseurl: http://adoptopenjdk.jfrog.io/adoptopenjdk/rpm/centos/8/$basearch
-        enabled: yes
-        gpgcheck: yes
+        enabled: true
+        gpgcheck: true
         gpgkey: https://adoptopenjdk.jfrog.io/adoptopenjdk/api/gpg/key/public
     - name: Install fontconfig, AdoptOpenJDK and git
       yum:
@@ -32,26 +32,26 @@
       
 - name: Jenkins installation
   hosts: jenkins_controllers
-  become: yes
+  become: true
   tasks:
     - name: enable and start firewalld service
       systemd:
         name: firewalld
         state: started
-        enabled: yes
+        enabled: true
     - name: permit traffic in default zone on port 8080/tcp
       ansible.posix.firewalld:
         port: 8080/tcp
-        permanent: yes
+        permanent: true
         state: enabled
-        immediate: yes
+        immediate: true
     - name: jenkins yum repository
       yum_repository:
         name: jenkins
         description: Jenkins-stable
         baseurl: http://pkg.jenkins.io/redhat-stable
-        enabled: yes
-        gpgcheck: yes
+        enabled: true
+        gpgcheck: true
         gpgkey: https://pkg.jenkins.io/redhat-stable/jenkins.io.key
     - name: Install Jenkins
       yum:
@@ -64,7 +64,7 @@
         state: directory
         owner: jenkins
         group: jenkins
-        recurse: yes
+        recurse: true
       with_items:
         - '/var/cache/jenkins/tmp'
         - '/var/cache/jenkins/heapdumps'
@@ -91,19 +91,19 @@
 
 - name: Agent installation
   hosts: agents
-  become: yes
+  become: true
   tasks:
     - name: enable and start firewalld service
       systemd:
         name: firewalld
         state: started
-        enabled: yes
+        enabled: true
     - name: permit traffic in default zone on port 22/tcp
       ansible.posix.firewalld:
         port: 22/tcp
-        permanent: yes
+        permanent: true
         state: enabled
-        immediate: yes
+        immediate: true
     - name: Install docker-ce (centos) via amazon-linux-extras packages
       shell: "amazon-linux-extras install docker -y"
     - name: add docker group
@@ -114,7 +114,7 @@
       user: 
         name: "{{ ansible_user }}"
         groups: docker
-        append: yes
+        append: true
     - name: do a ssh reset in order to reflect the $USER group changes
       meta: reset_connection
     - name: start Docker service
@@ -127,12 +127,12 @@
         state: directory
         owner: vagrant
         group: vagrant
-        recurse: yes
+        recurse: true
     - name: download Maven 3.8.5
       unarchive:
         src: https://mirrors.sonic.net/apache/maven/maven-3/3.8.5/binaries/apache-maven-3.8.5-bin.tar.gz
         dest: /opt/tools/maven
-        remote_src: yes
+        remote_src: true
     - name: create Maven latest symlink
       file: 
         src: /opt/tools/maven/apache-maven-3.8.5
@@ -151,12 +151,12 @@
         state: directory
         owner: vagrant
         group: vagrant
-        recurse: yes
+        recurse: true
     - name: download Gradle 7.2
       unarchive:
         src: https://services.gradle.org/distributions/gradle-7.2-bin.zip
         dest: /opt/tools/gradle
-        remote_src: yes
+        remote_src: true
     - name: create Gradle latest symlink
       file: 
         src: /opt/tools/gradle/gradle-7.2
@@ -175,4 +175,4 @@
         state: directory
         owner: vagrant
         group: vagrant
-        recurse: yes
+        recurse: true

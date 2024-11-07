@@ -1,8 +1,8 @@
 ---
 - name: Install base software on all
   hosts: all
-  gather_facts: yes
-  become: yes
+  gather_facts: true
+  become: true
   tasks:
     - name: update hosts
       lineinfile:
@@ -10,23 +10,23 @@
         regexp: ".*\t{{ hostvars[item]['ansible_hostname']}}\t{{ hostvars[item]['ansible_hostname']}}"
         line: "{{ hostvars[item]['ansible_ssh_host'] }}\t{{ hostvars[item]['ansible_hostname']}}\t{{ hostvars[item]['ansible_hostname']}}"
         state: present
-        backup: yes
+        backup: true
       with_items: "{{ ansible_play_batch }}"       
     - name: AdoptOpenJDK yum repository
       yum_repository:
         name: AdoptOpenJDK
         description: AdoptOpenJDK
         baseurl: http://adoptopenjdk.jfrog.io/adoptopenjdk/rpm/centos/$releasever/$basearch
-        enabled: yes
-        gpgcheck: yes
+        enabled: true
+        gpgcheck: true
         gpgkey: https://adoptopenjdk.jfrog.io/adoptopenjdk/api/gpg/key/public
     - name: Endpoint yum repository
       yum_repository:
         name: endpoint
         description: End Point repository
         baseurl: https://packages.endpointdev.com/rhel/$releasever/os/$basearch/
-        enabled: yes
-        gpgcheck: yes
+        enabled: true
+        gpgcheck: true
         gpgkey: https://packages.endpointdev.com/endpoint-rpmsign-7.pub
     - name: remove any installed git
       yum:
@@ -42,19 +42,19 @@
       
 - name: Common agent and Waypoint server installation
   hosts: agents,waypoint_servers
-  become: yes
+  become: true
   tasks:
     - name: enable and start firewalld service
       systemd:
         name: firewalld
         state: started
-        enabled: yes
+        enabled: true
     - name: permit traffic in default zone on port 22/tcp
       ansible.posix.firewalld:
         port: 22/tcp
-        permanent: yes
+        permanent: true
         state: enabled
-        immediate: yes
+        immediate: true
     - name: remove any installed docker
       yum:
         name:
@@ -72,16 +72,16 @@
         name: docker-ce-stable
         description: Docker CE Stable - $basearch
         baseurl: https://download.docker.com/linux/centos/7/$basearch/stable
-        enabled: yes
-        gpgcheck: yes
+        enabled: true
+        gpgcheck: true
         gpgkey: https://download.docker.com/linux/centos/gpg
     - name: hashicorp yum repository
       yum_repository:
         name: hashicorp
         description: Hashicorp Stable - $basearch
         baseurl: https://rpm.releases.hashicorp.com/RHEL/$releasever/$basearch/stable
-        enabled: yes
-        gpgcheck: yes
+        enabled: true
+        gpgcheck: true
         gpgkey: https://rpm.releases.hashicorp.com/gpg
     - name: Install Docker, waypoint and unzip
       yum:
@@ -101,7 +101,7 @@
       user: 
         name: "{{ ansible_user }}"
         groups: docker
-        append: yes
+        append: true
     - name: do a ssh reset in order to reflect the $USER group changes
       meta: reset_connection
     - name: start Docker service
@@ -111,7 +111,7 @@
 
 - name: Agent installation
   hosts: agents
-  become: yes
+  become: true
   tasks:
     - name: create Maven directory
       file: 
@@ -119,12 +119,12 @@
         state: directory
         owner: vagrant
         group: vagrant
-        recurse: yes
+        recurse: true
     - name: download Maven 3.8.5
       unarchive:
         src: https://mirrors.sonic.net/apache/maven/maven-3/3.8.5/binaries/apache-maven-3.8.5-bin.tar.gz
         dest: /opt/tools/maven
-        remote_src: yes
+        remote_src: true
     - name: create Maven latest symlink
       file: 
         src: /opt/tools/maven/apache-maven-3.8.5
@@ -143,12 +143,12 @@
         state: directory
         owner: vagrant
         group: vagrant
-        recurse: yes
+        recurse: true
     - name: download Gradle 7.2
       unarchive:
         src: https://services.gradle.org/distributions/gradle-7.2-bin.zip
         dest: /opt/tools/gradle
-        remote_src: yes
+        remote_src: true
     - name: create Gradle latest symlink
       file: 
         src: /opt/tools/gradle/gradle-7.2
@@ -167,7 +167,7 @@
         state: directory
         owner: vagrant
         group: vagrant
-        recurse: yes
+        recurse: true
 
 - name: Waypoint server installation
   hosts: waypoint_servers
@@ -194,56 +194,56 @@
       systemd:
         name: firewalld
         state: started
-        enabled: yes
+        enabled: true
     - name: permit traffic in default zone on port 8080/tcp
       ansible.posix.firewalld:
         port: 8080/tcp
-        permanent: yes
+        permanent: true
         state: enabled
-        immediate: yes
+        immediate: true
     - name: jenkins yum repository
-      become: yes
+      become: true
       yum_repository:
         name: jenkins
         description: Jenkins-stable
         baseurl: http://pkg.jenkins.io/redhat-stable
-        enabled: yes
-        gpgcheck: yes
+        enabled: true
+        gpgcheck: true
         gpgkey: https://pkg.jenkins.io/redhat-stable/jenkins.io.key
     - name: Install Jenkins
-      become: yes
+      become: true
       yum:
         name:
           - jenkins-2.319.3
         state: latest
     - name: Create directories for Jenkins
-      become: yes
+      become: true
       file:
         path: "{{ item }}"
         state: directory
         owner: jenkins
         group: jenkins
-        recurse: yes
+        recurse: true
       with_items:
         - '/var/cache/jenkins/tmp'
         - '/var/cache/jenkins/heapdumps'
         - '/var/lib/jenkins/plugins'
     - name: Update JENKINS_JAVA_OPTIONS
-      become: yes
+      become: true
       lineinfile:
         path: "/etc/sysconfig/jenkins"
         regexp: ".*-Djava.awt.headless=true.*"
         line: 'JENKINS_JAVA_OPTIONS="-Djava.awt.headless=true -Djava.net.preferIPv4Stack=true -Djenkins.install.runSetupWizard=false -Djava.io.tmpdir=/var/cache/jenkins/tmp/ -Dorg.apache.commons.jelly.tags.fmt.timeZone=America/New_York -Duser.timezone=America/New_York"'
         state: present
     - name: Update JENKINS_ARGS
-      become: yes
+      become: true
       lineinfile:
         path: "/etc/sysconfig/jenkins"
         regexp: ".*JENKINS_ARGS=.*"
         line: 'JENKINS_ARGS="--pluginroot=/var/cache/jenkins/plugins"'
         state: present
     - name: Create limits file
-      become: yes
+      become: true
       copy:
         dest: "/etc/security/limits.d/30-jenkins.conf"
         src: "30-jenkins.conf"
@@ -256,23 +256,23 @@
         dest: "$HOME/plugins.yaml"
         src: "plugins.yaml"
     - name: Copy the jenkins.yaml file
-      become: yes
+      become: true
       copy:
         dest: "/var/lib/jenkins/jenkins.yaml"
         src: "jenkins.yaml"
     - name: run the jenkins-plugin-manager
-      become: yes
+      become: true
       command: java -jar jenkins-plugin-manager.jar --jenkins-version 2.263.4 --plugin-file plugins.yaml --plugin-download-directory /var/lib/jenkins/plugins
     - name: update plugin ownership
-      become: yes
+      become: true
       file:
         path: /var/lib/jenkins
         owner: jenkins
         group: jenkins
         state: directory
-        recurse: yes
+        recurse: true
     - name: start jenkins service
-      become: yes
+      become: true
       systemd:
         name: jenkins
         state: started

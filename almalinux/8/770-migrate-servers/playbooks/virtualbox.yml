@@ -10,23 +10,23 @@
         regexp: ".*\t{{ hostvars[item]['ansible_hostname']}}\t{{ hostvars[item]['ansible_hostname']}}"
         line: "{{ hostvars[item]['ansible_ssh_host'] }}\t{{ hostvars[item]['ansible_hostname']}}\t{{ hostvars[item]['ansible_hostname']}}"
         state: present
-        backup: yes
+        backup: true
       with_items: "{{ ansible_play_batch }}"       
     - name: Adoptium yum repository
       yum_repository:
         name: Adoptium
         description: Adoptium
         baseurl: https://packages.adoptium.net/artifactory/rpm/rocky/$releasever/$basearch
-        enabled: yes
-        gpgcheck: yes
+        enabled: true
+        gpgcheck: true
         gpgkey: https://packages.adoptium.net/artifactory/api/gpg/key/public
     - name: jenkins yum repository
       yum_repository:
         name: jenkins
         description: Jenkins-stable
         baseurl: http://pkg.jenkins.io/redhat-stable
-        enabled: yes
-        gpgcheck: yes
+        enabled: true
+        gpgcheck: true
         gpgkey: https://pkg.jenkins.io/redhat-stable/jenkins.io-2023.key
     - name: remove any installed git
       yum:
@@ -48,19 +48,19 @@
       systemd:
         name: firewalld
         state: started
-        enabled: yes
+        enabled: true
     - name: permit traffic in default zone on port 8080/tcp
       ansible.posix.firewalld:
         port: 8080/tcp
-        permanent: yes
+        permanent: true
         state: enabled
-        immediate: yes
+        immediate: true
     - name: permit traffic in default zone on port 8443/tcp
       ansible.posix.firewalld:
         port: 8443/tcp
-        permanent: yes
+        permanent: true
         state: enabled
-        immediate: yes
+        immediate: true
     - name: Install Jenkins
       yum:
         name:
@@ -71,7 +71,7 @@
         state: directory
         owner: jenkins
         group: jenkins
-        recurse: yes
+        recurse: true
       with_items:
         - '/var/cache/jenkins/tmp'
         - '/var/cache/jenkins/heapdumps'
@@ -81,7 +81,7 @@
         state: directory
         owner: root
         group: root
-        recurse: yes
+        recurse: true
       with_items:
         - '/etc/systemd/system/jenkins.service.d'
     - name: Create override file
@@ -92,7 +92,7 @@
       systemd:
         name: jenkins
         state: restarted
-        enabled: yes
+        enabled: true
 
 
 - name: Jenkins new installation
@@ -103,19 +103,19 @@
       systemd:
         name: firewalld
         state: started
-        enabled: yes
+        enabled: true
     - name: permit traffic in default zone on port 8080/tcp
       ansible.posix.firewalld:
         port: 8080/tcp
-        permanent: yes
+        permanent: true
         state: enabled
-        immediate: yes
+        immediate: true
     - name: permit traffic in default zone on port 8443/tcp
       ansible.posix.firewalld:
         port: 8443/tcp
-        permanent: yes
+        permanent: true
         state: enabled
-        immediate: yes
+        immediate: true
     - name: Install Jenkins
       yum:
         name:
@@ -126,7 +126,7 @@
         state: directory
         owner: jenkins
         group: jenkins
-        recurse: yes
+        recurse: true
       with_items:
         - '/var/cache/jenkins/tmp'
         - '/var/cache/jenkins/heapdumps'
@@ -136,7 +136,7 @@
         state: directory
         owner: root
         group: root
-        recurse: yes
+        recurse: true
       with_items:
         - '/etc/systemd/system/jenkins.service.d'
     - name: Create override file
@@ -147,4 +147,4 @@
       systemd:
         name: jenkins
         state: restarted
-        enabled: yes
+        enabled: true
