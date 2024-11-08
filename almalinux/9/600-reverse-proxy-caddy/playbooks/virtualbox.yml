@@ -112,7 +112,7 @@
         src: "fullchain.pem"
         owner: caddy
         group: caddy
-        mode: '0744'
+        mode: '0644'
     - name: start jenkins service
       systemd:
         name: jenkins

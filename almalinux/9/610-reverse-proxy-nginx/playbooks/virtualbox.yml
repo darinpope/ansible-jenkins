@@ -47,6 +47,14 @@
         permanent: true
         state: enabled
         immediate: true
+    - name: add http access
+      command: firewall-cmd --zone=public --add-service=http --permanent
+    - name: add https access
+      command: firewall-cmd --zone=public --add-service=https --permanent
+    - name: reload the firewall
+      command: firewall-cmd --reload
+    - name: set SELinux for Apache permissions
+      command: setsebool -P httpd_can_network_connect true
     - name: jenkins yum repository
       yum_repository:
         name: jenkins
@@ -59,6 +67,7 @@
       dnf:
         name:
           - jenkins-2.479.1
+          - nginx
         state: latest
     - name: Create directories for Jenkins
       file:
@@ -83,8 +92,32 @@
       copy:
         dest: "/etc/systemd/system/jenkins.service.d/override.conf"
         src: "override.conf"
+    - name: Create nginx file
+      copy:
+        dest: "/etc/nginx/conf.d/jenkins.conf"
+        src: "jenkins.conf"
+    - name: create ssl directory
+      file:
+        path: /etc/nginx/ssl
+        state: directory
+        mode: '0755'
+    - name: Create SSL private key
+      copy:
+        dest: "/etc/nginx/ssl/privkey.pem"
+        src: "privkey.pem"
+        mode: '0600'
+    - name: Create SSL certificate
+      copy:
+        dest: "/etc/nginx/ssl/fullchain.pem"
+        src: "fullchain.pem"
+        mode: '0644'
     - name: start jenkins service
       systemd:
         name: jenkins
         state: restarted
         enabled: true
+    - name: start nginx service
+      systemd:
+        name: nginx
+        state: restarted
+        enabled: true        
