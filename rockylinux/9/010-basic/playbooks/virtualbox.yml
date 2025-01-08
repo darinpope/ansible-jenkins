@@ -38,7 +38,7 @@
     - name: Install temurin and git
       dnf:
         name:
-          - temurin-17-jdk
+          - temurin-21-jdk
           - git
           - tree
         state: latest

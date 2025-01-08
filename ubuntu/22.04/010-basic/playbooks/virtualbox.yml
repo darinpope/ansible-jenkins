@@ -23,7 +23,7 @@
     - name: Install common software
       apt:
         name:
-          - temurin-17-jdk
+          - temurin-21-jdk
           - apt-transport-https 
           - ca-certificates 
           - curl 

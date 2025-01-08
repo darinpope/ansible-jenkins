@@ -28,7 +28,7 @@
       dnf:
         name:
           - git
-          - temurin-17-jdk
+          - temurin-21-jdk
         state: latest
       
 - name: Jenkins installation
