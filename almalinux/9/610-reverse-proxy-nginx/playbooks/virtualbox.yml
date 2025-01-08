@@ -66,7 +66,7 @@
     - name: Install Jenkins
       dnf:
         name:
-          - jenkins-2.479.1
+          - jenkins-2.479.3
           - nginx
         state: latest
     - name: Create directories for Jenkins
