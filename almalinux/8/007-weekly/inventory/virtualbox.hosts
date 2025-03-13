@@ -2,4 +2,4 @@
 ansible_ssh_common_args='-o StrictHostKeyChecking=no'
 
 [jenkins]
-weekly ansible_ssh_host=192.168.1.85 ansible_ssh_port=22
+weekly ansible_ssh_host=192.168.56.13 ansible_ssh_port=22 ansible_user=vagrant ansible_ssh_private_key_file=.vagrant/machines/weekly/virtualbox/private_key
