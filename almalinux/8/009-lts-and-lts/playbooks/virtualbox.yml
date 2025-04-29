@@ -35,7 +35,7 @@
     - name: Install Temurin and git
       yum:
         name:
-          - temurin-17-jdk
+          - temurin-21-jdk
           - git
           - wget
         state: latest
