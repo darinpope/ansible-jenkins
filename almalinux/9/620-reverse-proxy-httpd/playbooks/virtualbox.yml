@@ -67,7 +67,7 @@
     - name: Install Jenkins
       dnf:
         name:
-          - jenkins-2.492.2
+          - jenkins-2.504.1
           - httpd
           - httpd-tools
           - mod_ssl
