@@ -1,41 +1,89 @@
 ---
-- name: Install base software on all as root
+- name: Install software that should be installed as root
   hosts: all
   gather_facts: true
   become: true
   tasks:
+    - name: add GitHub apt key
+      ansible.builtin.apt_key:
+        url: https://cli.github.com/packages/githubcli-archive-keyring.gpg
+        state: present
+    - name: add GitHub repository
+      ansible.builtin.apt_repository:
+        repo: deb https://cli.github.com/packages stable main
+        state: present
     - name: add Google Cloud apt key
-      apt_key:
+      ansible.builtin.apt_key:
         url: https://packages.cloud.google.com/apt/doc/apt-key.gpg
         state: present
     - name: add Google Cloud repository
-      apt_repository:
+      ansible.builtin.apt_repository:
         repo: deb https://packages.cloud.google.com/apt cloud-sdk main
         state: present
     - name: add Helm apt key
-      apt_key:
+      ansible.builtin.apt_key:
         url: https://baltocdn.com/helm/signing.asc
         state: present
     - name: add Helm repository
-      apt_repository:
+      ansible.builtin.apt_repository:
         repo: deb https://baltocdn.com/helm/stable/debian/ all main
         state: present
     - name: add Microsoft apt key
-      apt_key:
+      ansible.builtin.apt_key:
         url: https://packages.microsoft.com/keys/microsoft.asc
         state: present
     - name: add Microsoft repository
-      apt_repository:
+      ansible.builtin.apt_repository:
         repo: deb https://packages.microsoft.com/repos/azure-cli/ noble main
         state: present
     - name: Run the equivalent of "apt-get update" as a separate step
-      apt:
+      ansible.builtin.apt:
         update_cache: true
     - name: Upgrade the OS (apt-get dist-upgrade)
-      apt:
+      ansible.builtin.apt:
         upgrade: dist
-    - name: Install common software
-      apt:
+    - name: remove any installed docker
+      ansible.builtin.apt:
+        name:
+          - docker 
+          - docker-engine 
+          - docker.io 
+          - containerd 
+          - runc 
+        state: absent
+    - name: add docker-ce apt key
+      ansible.builtin.apt_key:
+        url: https://download.docker.com/linux/ubuntu/gpg
+        state: present
+    - name: docker-ce-stable deb repository
+      ansible.builtin.apt_repository:
+        repo: deb [arch=amd64] https://download.docker.com/linux/ubuntu focal stable
+        state: present
+    - name: Install Docker
+      ansible.builtin.apt:
+        name: 
+          - docker-ce
+          - docker-ce-cli
+          - containerd.io
+        state: latest
+    - name: add docker group
+      ansible.builtin.group:
+        name: docker
+        state: present
+    - name: add $USER to docker group
+      ansible.builtin.user: 
+        name: "{{ ansible_user }}"
+        groups: docker
+        append: true
+    - name: do a ssh reset in order to reflect the $USER group changes
+      meta: reset_connection
+    - name: start Docker service
+      ansible.builtin.systemd:
+        name: docker
+        state: restarted   
+        enabled: true
+    - name: Install software that can be installed via apt
+      ansible.builtin.apt:
         name:
           - apt-transport-https 
           - ca-certificates 
@@ -51,77 +99,101 @@
           - azure-cli
           - helm
           - lsb-release
+          - gh
         state: latest
     - name: download opscore
-      get_url:
+      ansible.builtin.get_url:
         url: https://s3.amazonaws.com/cloudbees-opscore/releases/stable/linux/amd64/opscore
         dest: /usr/local/bin/opscore
         mode: '0755'        
     - name: download yq
-      get_url:
+      ansible.builtin.get_url:
         url: https://github.com/mikefarah/yq/releases/latest/download/yq_linux_amd64
         dest: /usr/local/bin/yq
         mode: '0755'        
+    - name: download kubectl
+      ansible.builtin.get_url:
+        url: https://s3.us-west-2.amazonaws.com/amazon-eks/1.32.0/2024-12-20/bin/linux/amd64/kubectl
+        dest: /usr/local/bin/kubectl
+        mode: '0755'
     - name: create AWS directory
-      file: 
+      ansible.builtin.file: 
         path: "/opt/tools/aws"
         state: directory
         owner: vagrant
         group: vagrant
         recurse: true
     - name: download AWS CLI
-      unarchive:
+      ansible.builtin.unarchive:
         src: https://awscli.amazonaws.com/awscli-exe-linux-x86_64.zip
         dest: /opt/tools/aws
         remote_src: true
     - name: run the AWS installer
-      become: true
-      command: /opt/tools/aws/aws/install --update
+      ansible.builtin.command: 
+        cmd: /opt/tools/aws/aws/install --update
     - name: create helmfile directory
-      file: 
+      ansible.builtin.file: 
         path: "/opt/tools/helmfile"
         state: directory
         owner: vagrant
         group: vagrant
         recurse: true
     - name: download helmfile installer
-      unarchive:
+      ansible.builtin.unarchive:
         src: https://github.com/helmfile/helmfile/releases/download/v1.0.0/helmfile_1.0.0_linux_amd64.tar.gz
         dest: /opt/tools/helmfile
         remote_src: true
     - name: setup helmfile profile
-      copy:
+      ansible.builtin.copy:
         dest: /etc/profile.d/helmfile.sh
         content: |
           PATH=/opt/tools/helmfile:$PATH
     - name: create eksctl directory
-      file: 
+      ansible.builtin.file: 
         path: "/opt/tools/eksctl"
         state: directory
         owner: vagrant
         group: vagrant
         recurse: true
     - name: download eksctl installer
-      unarchive:
+      ansible.builtin.unarchive:
         src: https://github.com/eksctl-io/eksctl/releases/latest/download/eksctl_Linux_amd64.tar.gz
         dest: /opt/tools/eksctl
         remote_src: true
     - name: setup eksctl profile
-      copy:
+      ansible.builtin.copy:
         dest: /etc/profile.d/eksctl.sh
         content: |
           PATH=/opt/tools/eksctl:$PATH
+    - name: create stern directory
+      ansible.builtin.file: 
+        path: "/opt/tools/stern"
+        state: directory
+        owner: vagrant
+        group: vagrant
+        recurse: true
+    - name: download stern installer
+      ansible.builtin.unarchive:
+        src: https://github.com/stern/stern/releases/download/v1.32.0/stern_1.32.0_linux_amd64.tar.gz
+        dest: /opt/tools/stern
+        remote_src: true
+    - name: setup stern profile
+      ansible.builtin.copy:
+        dest: /etc/profile.d/stern.sh
+        content: |
+          PATH=/opt/tools/stern:$PATH
     - name: set final ownership to /opt/tools
-      file: 
+      ansible.builtin.file: 
         path: "/opt/tools"
         state: directory
         owner: vagrant
         group: vagrant
         recurse: true
-- name: Install base software on all as regular user
+
+- name: Install software that should be installed as regular user
   hosts: all
   gather_facts: true
   tasks:
-    - name: install helm-diff plugin
-      command: 
-        cmd: helm plugin install https://github.com/databus23/helm-diff
+    - name: install/update helm-diff plugin
+      ansible.builtin.shell: 
+        cmd: helm plugin install https://github.com/databus23/helm-diff || helm plugin update diff
