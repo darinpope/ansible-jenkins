@@ -116,6 +116,11 @@
         url: https://s3.us-west-2.amazonaws.com/amazon-eks/1.32.0/2024-12-20/bin/linux/amd64/kubectl
         dest: /usr/local/bin/kubectl
         mode: '0755'
+    - name: download kind
+      ansible.builtin.get_url:
+        url: https://kind.sigs.k8s.io/dl/v0.27.0/kind-linux-amd64
+        dest: /usr/local/bin/kind
+        mode: '0755'
     - name: create AWS directory
       ansible.builtin.file: 
         path: "/opt/tools/aws"
@@ -182,6 +187,23 @@
         dest: /etc/profile.d/stern.sh
         content: |
           PATH=/opt/tools/stern:$PATH
+    - name: create openshift directory
+      ansible.builtin.file: 
+        path: "/opt/tools/openshift"
+        state: directory
+        owner: vagrant
+        group: vagrant
+        recurse: true
+    - name: download openshift installer
+      ansible.builtin.unarchive:
+        src: https://mirror.openshift.com/pub/openshift-v4/clients/ocp/latest/openshift-client-linux-4.18.12.tar.gz
+        dest: /opt/tools/openshift
+        remote_src: true
+    - name: setup openshift profile
+      ansible.builtin.copy:
+        dest: /etc/profile.d/openshift.sh
+        content: |
+          PATH=/opt/tools/openshift:$PATH
     - name: set final ownership to /opt/tools
       ansible.builtin.file: 
         path: "/opt/tools"
