@@ -1,0 +1,127 @@
+---
+- name: Install base software on all as root
+  hosts: all
+  gather_facts: true
+  become: true
+  tasks:
+    - name: add Google Cloud apt key
+      apt_key:
+        url: https://packages.cloud.google.com/apt/doc/apt-key.gpg
+        state: present
+    - name: add Google Cloud repository
+      apt_repository:
+        repo: deb https://packages.cloud.google.com/apt cloud-sdk main
+        state: present
+    - name: add Helm apt key
+      apt_key:
+        url: https://baltocdn.com/helm/signing.asc
+        state: present
+    - name: add Helm repository
+      apt_repository:
+        repo: deb https://baltocdn.com/helm/stable/debian/ all main
+        state: present
+    - name: add Microsoft apt key
+      apt_key:
+        url: https://packages.microsoft.com/keys/microsoft.asc
+        state: present
+    - name: add Microsoft repository
+      apt_repository:
+        repo: deb https://packages.microsoft.com/repos/azure-cli/ noble main
+        state: present
+    - name: Run the equivalent of "apt-get update" as a separate step
+      apt:
+        update_cache: true
+    - name: Upgrade the OS (apt-get dist-upgrade)
+      apt:
+        upgrade: dist
+    - name: Install common software
+      apt:
+        name:
+          - apt-transport-https 
+          - ca-certificates 
+          - curl 
+          - git
+          - gnupg
+          - gnupg-agent 
+          - software-properties-common
+          - unzip
+          - wget
+          - make
+          - google-cloud-cli
+          - azure-cli
+          - helm
+          - lsb-release
+        state: latest
+    - name: download opscore
+      get_url:
+        url: https://s3.amazonaws.com/cloudbees-opscore/releases/stable/linux/amd64/opscore
+        dest: /usr/local/bin/opscore
+        mode: '0755'        
+    - name: download yq
+      get_url:
+        url: https://github.com/mikefarah/yq/releases/latest/download/yq_linux_amd64
+        dest: /usr/local/bin/yq
+        mode: '0755'        
+    - name: create AWS directory
+      file: 
+        path: "/opt/tools/aws"
+        state: directory
+        owner: vagrant
+        group: vagrant
+        recurse: true
+    - name: download AWS CLI
+      unarchive:
+        src: https://awscli.amazonaws.com/awscli-exe-linux-x86_64.zip
+        dest: /opt/tools/aws
+        remote_src: true
+    - name: run the AWS installer
+      become: true
+      command: /opt/tools/aws/aws/install --update
+    - name: create helmfile directory
+      file: 
+        path: "/opt/tools/helmfile"
+        state: directory
+        owner: vagrant
+        group: vagrant
+        recurse: true
+    - name: download helmfile installer
+      unarchive:
+        src: https://github.com/helmfile/helmfile/releases/download/v1.0.0/helmfile_1.0.0_linux_amd64.tar.gz
+        dest: /opt/tools/helmfile
+        remote_src: true
+    - name: setup helmfile profile
+      copy:
+        dest: /etc/profile.d/helmfile.sh
+        content: |
+          PATH=/opt/tools/helmfile:$PATH
+    - name: create eksctl directory
+      file: 
+        path: "/opt/tools/eksctl"
+        state: directory
+        owner: vagrant
+        group: vagrant
+        recurse: true
+    - name: download eksctl installer
+      unarchive:
+        src: https://github.com/eksctl-io/eksctl/releases/latest/download/eksctl_Linux_amd64.tar.gz
+        dest: /opt/tools/eksctl
+        remote_src: true
+    - name: setup eksctl profile
+      copy:
+        dest: /etc/profile.d/eksctl.sh
+        content: |
+          PATH=/opt/tools/eksctl:$PATH
+    - name: set final ownership to /opt/tools
+      file: 
+        path: "/opt/tools"
+        state: directory
+        owner: vagrant
+        group: vagrant
+        recurse: true
+- name: Install base software on all as regular user
+  hosts: all
+  gather_facts: true
+  tasks:
+    - name: install helm-diff plugin
+      command: 
+        cmd: helm plugin install https://github.com/databus23/helm-diff
