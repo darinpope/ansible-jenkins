@@ -127,11 +127,11 @@
         enabled: true
     - name: download Jenkins RC war file
       get_url:
-        url: https://github.com/jenkinsci/jenkins/releases/download/jenkins-{{ rcversion }}-rc/jenkins.war
-        dest: /usr/share/java/jenkins.war
-        owner: root
-        group: root
-        mode: '0644'
+        url: "https://github.com/jenkinsci/jenkins/releases/download/jenkins-{{ rcversion }}-rc/jenkins.war"
+        dest: "/usr/share/java/jenkins.war"
+        owner: "root"
+        group: "root"
+        mode: "0644"
     - name: Create directories for Jenkins
       file:
         path: "{{ item }}"
