@@ -120,7 +120,7 @@
       yum:
         name:
           - jenkins-{{ version }}
-    - name: start jenkins service
+    - name: stop jenkins service
       systemd:
         name: jenkins
         state: stopped
@@ -155,7 +155,7 @@
       copy:
         dest: "/etc/systemd/system/jenkins.service.d/override.conf"
         src: "override.conf"
-    - name: start jenkins service
+    - name: restart jenkins service
       systemd:
         name: jenkins
         state: restarted
