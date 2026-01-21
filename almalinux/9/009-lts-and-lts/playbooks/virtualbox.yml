@@ -7,8 +7,8 @@
     - name: update hosts
       lineinfile:
         path: "/etc/hosts"
-        regexp: ".*\t{{ hostvars[item]['ansible_hostname']}}\t{{ hostvars[item]['ansible_hostname']}}"
-        line: "{{ hostvars[item]['ansible_ssh_host'] }}\t{{ hostvars[item]['ansible_hostname']}}\t{{ hostvars[item]['ansible_hostname']}}"
+        regexp: ".*\t{{ hostvars[item]['ansible_facts']['hostname']}}\t{{ hostvars[item]['ansible_facts']['hostname']}}"
+        line: "{{ hostvars[item]['ansible_host'] }}\t{{ hostvars[item]['ansible_facts']['hostname']}}\t{{ hostvars[item]['ansible_facts']['hostname']}}"
         state: present
         backup: true
       with_items: "{{ ansible_play_batch }}"       
@@ -20,14 +20,6 @@
         enabled: true
         gpgcheck: true
         gpgkey: https://packages.adoptium.net/artifactory/api/gpg/key/public
-    - name: jenkins yum repository
-      yum_repository:
-        name: jenkins
-        description: Jenkins-stable
-        baseurl: http://pkg.jenkins.io/rpm-stable
-        enabled: true
-        gpgcheck: true
-        gpgkey: https://pkg.jenkins.io/rpm-stable/jenkins.io-2026.key
     - name: remove any installed git
       yum:
         name: git
@@ -61,6 +53,14 @@
         permanent: true
         state: enabled
         immediate: true
+    - name: jenkins yum repository
+      yum_repository:
+        name: jenkins
+        description: Jenkins-stable
+        baseurl: http://pkg.jenkins.io/redhat-stable-legacy
+        enabled: true
+        gpgcheck: true
+        gpgkey: https://pkg.jenkins.io/redhat-stable-legacy/jenkins.io-2023.key
     - name: Install Jenkins
       yum:
         name:
@@ -116,6 +116,14 @@
         permanent: true
         state: enabled
         immediate: true
+    - name: jenkins yum repository
+      yum_repository:
+        name: jenkins
+        description: Jenkins-stable
+        baseurl: https://pkg.jenkins.io/rpm-stable
+        enabled: true
+        gpgcheck: true
+        gpgkey: https://pkg.jenkins.io/rpm-stable/jenkins.io-2026.key
     - name: Install Jenkins
       yum:
         name:
