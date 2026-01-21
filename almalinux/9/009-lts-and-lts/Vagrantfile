@@ -3,7 +3,7 @@ Vagrant.configure(2) do |config|
 
   config.vm.define "jenkinsold" do |jenkinsold|
     jenkinsold.vm.network "private_network", ip: "192.168.56.13"
-    jenkinsold.vm.network "public_network", ip: "192.168.0.246", bridge: "en0: Wi-Fi"
+    jenkinsold.vm.network "public_network", ip: "192.168.0.246", bridge: "en5: USB 10/100/1000 LAN"
     jenkinsold.vm.hostname = "jenkinsold"
     jenkinsold.vm.provider "virtualbox" do |vb|
       vb.cpus = 1
@@ -13,7 +13,7 @@ Vagrant.configure(2) do |config|
 
   config.vm.define "jenkinsnew" do |jenkinsnew|
     jenkinsnew.vm.network "private_network", ip: "192.168.56.16"
-    jenkinsnew.vm.network "public_network", ip: "192.168.0.247", bridge: "en0: Wi-Fi"
+    jenkinsnew.vm.network "public_network", ip: "192.168.0.247", bridge: "en5: USB 10/100/1000 LAN"
     jenkinsnew.vm.hostname = "jenkinsnew"
     jenkinsnew.vm.provider "virtualbox" do |vb|
       vb.cpus = 1
