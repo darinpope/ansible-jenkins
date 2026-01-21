@@ -24,7 +24,7 @@
       yum_repository:
         name: jenkins
         description: Jenkins-stable
-        baseurl: http://pkg.jenkins.io/redhat-stable
+        baseurl: http://pkg.jenkins.io/rpm-stable
         enabled: true
         gpgcheck: true
         gpgkey: https://pkg.jenkins.io/rpm-stable/jenkins.io-2026.key
