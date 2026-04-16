@@ -20,6 +20,14 @@
         enabled: true
         gpgcheck: true
         gpgkey: https://packages.adoptium.net/artifactory/api/gpg/key/public
+    - name: jenkins yum repository
+      yum_repository:
+        name: jenkins
+        description: Jenkins-stable
+        baseurl: https://pkg.jenkins.io/rpm-stable
+        enabled: true
+        gpgcheck: true
+        gpgkey: https://pkg.jenkins.io/rpm-stable/jenkins.io-2026.key
     - name: remove any installed git
       yum:
         name: git
@@ -53,14 +61,6 @@
         permanent: true
         state: enabled
         immediate: true
-    - name: jenkins yum repository
-      yum_repository:
-        name: jenkins
-        description: Jenkins-stable
-        baseurl: http://pkg.jenkins.io/redhat-stable-legacy
-        enabled: true
-        gpgcheck: true
-        gpgkey: https://pkg.jenkins.io/redhat-stable-legacy/jenkins.io-2023.key
     - name: Install Jenkins
       yum:
         name:
@@ -116,14 +116,6 @@
         permanent: true
         state: enabled
         immediate: true
-    - name: jenkins yum repository
-      yum_repository:
-        name: jenkins
-        description: Jenkins-stable
-        baseurl: https://pkg.jenkins.io/rpm-stable
-        enabled: true
-        gpgcheck: true
-        gpgkey: https://pkg.jenkins.io/rpm-stable/jenkins.io-2026.key
     - name: Install Jenkins
       yum:
         name:
